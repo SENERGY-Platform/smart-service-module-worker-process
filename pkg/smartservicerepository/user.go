@@ -42,8 +42,7 @@ func (this *SmartServiceRepository) GetInstanceUser(instanceId string) (userId s
 		err = errors.New(string(temp))
 		return userId, err
 	}
-	respUserId := ""
-	err = json.NewDecoder(resp.Body).Decode(&respUserId)
+	err = json.NewDecoder(resp.Body).Decode(&userId)
 	if err != nil {
 		return userId, err
 	}

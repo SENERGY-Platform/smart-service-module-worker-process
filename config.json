@@ -1,5 +1,6 @@
 {
     "smart_service_repository_url": "",
+    "process_deployment_url": "",
     "camunda_url": "",
 
     "camunda_worker_id": "process_deployment",
@@ -7,6 +8,9 @@
     "camunda_lock_duration_in_ms": 60000,
     "camunda_worker_wait_duration_in_ms": 1000,
     "camunda_fetch_max_tasks": 100,
+
+    "process_deployment_source": "sepl",
+    "worker_param_prefix": "process_deployment.",
 
     "auth_endpoint": "",
     "auth_client_id": "",
