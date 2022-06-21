@@ -3,9 +3,10 @@ module github.com/SENERGY-Platform/smart-service-module-worker-process
 go 1.18
 
 require (
-	github.com/SENERGY-Platform/process-deployment v0.0.0-20220523082917-9f026e261003
+	github.com/SENERGY-Platform/process-deployment v0.0.0-20220530063634-9bbc7010f749
 	github.com/coocood/freecache v1.2.1
 	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/julienschmidt/httprouter v1.3.0
 )
 
 require (

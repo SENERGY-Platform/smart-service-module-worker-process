@@ -72,7 +72,7 @@ func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmod
 		debug.PrintStack()
 		return result, err
 	}
-	req, err := http.NewRequest("GET", this.config.ProcessDeploymentUrl+"/v3/deployments"+queryStr, body)
+	req, err := http.NewRequest("POST", this.config.ProcessDeploymentUrl+"/v3/deployments"+queryStr, body)
 	if err != nil {
 		return result, err
 	}
