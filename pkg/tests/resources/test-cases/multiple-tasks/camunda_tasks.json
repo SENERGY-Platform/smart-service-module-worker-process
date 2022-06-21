@@ -1,0 +1,58 @@
+[
+    {
+        "id": "task1",
+        "processInstanceId": "process-instance-1",
+        "processDefinitionId": "process-definition-1",
+        "variables": {
+            "foo": {
+                "value": "bar"
+            },
+            "process_deployment.module_data": {
+                "value": "{\"additional-info\": 42}"
+            },
+            "process_deployment.process_model_id": {
+                "value": "test-model-id"
+            },
+            "process_deployment.name": {
+                "value": "test-deployment-name-updated"
+            },
+            "process_deployment.Task_03f9hy3.selection": {
+                "value": "{\"device_selection\":{\"device_id\":\"device_1\",\"service_id\":\"s1\",\"path\":\"root.value_s1.v1\"}}"
+            },
+            "process_deployment.Task_03f9hy3.parameter.inputs.r": {
+                "value": 255
+            },
+            "process_deployment.Task_03f9hy3.parameter.inputs.b": {
+                "value": "100"
+            }
+        }
+    },
+    {
+        "id": "task2",
+        "processInstanceId": "process-instance-2",
+        "processDefinitionId": "process-definition-1",
+        "variables": {
+            "foo": {
+                "value": "bar"
+            },
+            "process_deployment.module_data": {
+                "value": "{\"additional-info\": 42}"
+            },
+            "process_deployment.process_model_id": {
+                "value": "test-model-id"
+            },
+            "process_deployment.name": {
+                "value": "test-deployment-name-updated"
+            },
+            "process_deployment.Task_03f9hy3.selection": {
+                "value": "{\"device_group_selection\":{\"id\":\"group_1\"}}"
+            },
+            "process_deployment.Task_03f9hy3.parameter.inputs.r": {
+                "value": 255
+            },
+            "process_deployment.Task_03f9hy3.parameter.inputs.b": {
+                "value": "100"
+            }
+        }
+    }
+]

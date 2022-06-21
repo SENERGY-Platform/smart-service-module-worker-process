@@ -1,0 +1,7 @@
+[
+    {
+        "method":"PUT",
+        "endpoint":"/instances-by-process-id/process-instance-1/error",
+        "message":"\"missing process model id\"\n"
+    }
+]
