@@ -103,7 +103,7 @@ func (this *ProcessDeployment) setSelection(task model.CamundaExternalTask, elem
 	}
 	if selection.ImportSelection != nil {
 		elementSelection.SelectedImportId = &selection.ImportSelection.Id
-		if selection.DeviceSelection.Path != nil {
+		if selection.ImportSelection.Path != nil {
 			elementSelection.SelectedPath = &deviceselectionmodel.PathOption{
 				Path: *selection.ImportSelection.Path,
 				//TODO: check if other fields are needed

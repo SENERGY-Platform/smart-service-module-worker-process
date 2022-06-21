@@ -1,0 +1,12 @@
+[
+    {
+        "method":"GET",
+        "endpoint":"/instances-by-process-id/process-instance-1/user-id",
+        "message":""
+    },
+    {
+        "method":"PUT",
+        "endpoint":"/instances-by-process-id/process-instance-1/error",
+        "message":"\"missing iot selection for StartEvent_1\"\n"
+    }
+]
