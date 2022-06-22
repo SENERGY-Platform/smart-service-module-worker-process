@@ -28,7 +28,7 @@ import (
 
 type Config struct {
 	SmartServiceRepositoryUrl            string `json:"smart_service_repository_url"`
-	CamundaUrl                           string `json:"camunda_url"`
+	CamundaUrl                           string `json:"camunda_url" config:"secret"`
 	CamundaWorkerId                      string `json:"camunda_worker_id"`
 	CamundaWorkerTopic                   string `json:"camunda_worker_topic"`
 	CamundaLockDurationInMs              int64  `json:"camunda_lock_duration_in_ms"`
