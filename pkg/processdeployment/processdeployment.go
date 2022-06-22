@@ -48,22 +48,27 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 	}
 	userId, err := this.smartServiceRepo.GetInstanceUser(task.ProcessInstanceId)
 	if err != nil {
+		log.Println("ERROR: unable to get instance user", err)
 		return modules, outputs, err
 	}
 	token, err := this.auth.ExchangeUserToken(userId)
 	if err != nil {
+		log.Println("ERROR: unable to exchange user token", err)
 		return modules, outputs, err
 	}
 	deployment, err := this.PrepareRequest(token, modelId)
 	if err != nil {
+		log.Println("ERROR: unable to prepare process deployment", err)
 		return modules, outputs, err
 	}
 	err = this.UseVariables(task, &deployment)
 	if err != nil {
+		log.Println("ERROR: unable to use variables", err)
 		return modules, outputs, err
 	}
 	resultDeployment, err := this.Deploy(token, deployment, true)
 	if err != nil {
+		log.Println("ERROR: unable to deploy process", err)
 		return modules, outputs, err
 	}
 

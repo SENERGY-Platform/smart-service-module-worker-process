@@ -30,7 +30,7 @@ import (
 
 func (this *SmartServiceRepository) SendWorkerError(task model.CamundaExternalTask, errMsg error) error {
 	body := new(bytes.Buffer)
-	err := json.NewEncoder(body).Encode(errMsg.Error())
+	err := json.NewEncoder(body).Encode(this.config.CamundaWorkerTopic + ": " + errMsg.Error())
 	if err != nil {
 		log.Println("ERROR:", err)
 		debug.PrintStack()
