@@ -17,7 +17,7 @@
                 "value": "test-deployment-name-updated"
             },
             "process_deployment.StartEvent_1.selection": {
-                "value": "{\"import_selection\":{\"id\":\"import_2\",\"path\":\"root.value\"}}"
+                "value": "{\"import_selection\":{\"id\":\"import_2\",\"characteristic_id\":\"test-characteristic\",\"path\":\"root.value\"}}"
             }
         }
     }

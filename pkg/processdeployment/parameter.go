@@ -97,7 +97,9 @@ func (this *ProcessDeployment) setSelection(task model.CamundaExternalTask, elem
 		if selection.DeviceSelection.Path != nil {
 			elementSelection.SelectedPath = &deviceselectionmodel.PathOption{
 				Path: *selection.DeviceSelection.Path,
-				//TODO: check if other fields are needed
+			}
+			if selection.DeviceSelection.CharacteristicId != nil {
+				elementSelection.SelectedPath.CharacteristicId = *selection.DeviceSelection.CharacteristicId
 			}
 		}
 	}
@@ -106,7 +108,9 @@ func (this *ProcessDeployment) setSelection(task model.CamundaExternalTask, elem
 		if selection.ImportSelection.Path != nil {
 			elementSelection.SelectedPath = &deviceselectionmodel.PathOption{
 				Path: *selection.ImportSelection.Path,
-				//TODO: check if other fields are needed
+			}
+			if selection.ImportSelection.CharacteristicId != nil {
+				elementSelection.SelectedPath.CharacteristicId = *selection.ImportSelection.CharacteristicId
 			}
 		}
 	}

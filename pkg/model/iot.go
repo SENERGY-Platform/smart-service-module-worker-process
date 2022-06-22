@@ -23,9 +23,10 @@ type IotOption struct {
 }
 
 type DeviceSelection struct {
-	DeviceId  string  `json:"device_id"`
-	ServiceId *string `json:"service_id"`
-	Path      *string `json:"path"`
+	DeviceId         string  `json:"device_id"`
+	ServiceId        *string `json:"service_id"`
+	Path             *string `json:"path"`
+	CharacteristicId *string `json:"characteristic_id,omitempty"`
 }
 
 type DeviceGroupSelection struct {
@@ -33,6 +34,7 @@ type DeviceGroupSelection struct {
 }
 
 type ImportSelection struct {
-	Id   string  `json:"id"`
-	Path *string `json:"path"`
+	Id               string  `json:"id"`
+	Path             *string `json:"path"`
+	CharacteristicId *string `json:"characteristic_id,omitempty"`
 }
