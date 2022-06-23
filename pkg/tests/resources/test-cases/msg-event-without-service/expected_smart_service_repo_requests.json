@@ -7,6 +7,6 @@
     {
         "method":"PUT",
         "endpoint":"/instances-by-process-id/process-instance-1/error",
-        "message":"\"missing service selection in event\\n\"\n"
+        "message":"\"process_deployment: missing service selection in event\\n\"\n"
     }
 ]
