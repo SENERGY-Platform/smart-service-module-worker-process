@@ -1,5 +1,5 @@
 
-## Camunda-Imput-Variables
+## Camunda-Input-Variables
 
 ### Process-Model-Id
 
