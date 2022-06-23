@@ -19,7 +19,7 @@ package mocks
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/auth"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 	"net/http"
 	"net/http/httptest"
 	"strings"

@@ -20,7 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/SENERGY-Platform/process-deployment/lib/api/util"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/model"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 	"github.com/julienschmidt/httprouter"
 	"io"
 	"net/http"

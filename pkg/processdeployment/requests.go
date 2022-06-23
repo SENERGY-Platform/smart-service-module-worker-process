@@ -20,10 +20,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/auth"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/model"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 	"io"
 	"log"
 	"net/http"
@@ -90,32 +88,4 @@ func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmod
 	}
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	return result, err
-}
-
-func (this *ProcessDeployment) useModuleDeleteInfo(info model.ModuleDeleteInfo) error {
-	req, err := http.NewRequest("DELETE", info.Url, nil)
-	if err != nil {
-		return err
-	}
-	if info.UserId != "" {
-		token, err := this.auth.ExchangeUserToken(info.UserId)
-		if err != nil {
-			return err
-		}
-		req.Header.Set("Authorization", token.Jwt())
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode >= 300 && resp.StatusCode != http.StatusNotFound {
-		temp, _ := io.ReadAll(resp.Body)
-		err = fmt.Errorf("unexpected response: %v, %v", resp.StatusCode, string(temp))
-		log.Println("ERROR:", err)
-		debug.PrintStack()
-		return err
-	}
-	_, _ = io.ReadAll(resp.Body)
-	return nil
 }

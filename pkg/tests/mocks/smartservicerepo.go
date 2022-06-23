@@ -20,7 +20,8 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/SENERGY-Platform/process-deployment/lib/api/util"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/configuration"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
+	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/processdeployment"
 	"github.com/julienschmidt/httprouter"
 	"io"
 	"net/http"
@@ -29,14 +30,15 @@ import (
 	"sync"
 )
 
-func NewSmartServiceRepoMock(config configuration.Config) *SmartServiceRepoMock {
-	return &SmartServiceRepoMock{config: config}
+func NewSmartServiceRepoMock(libConfig configuration.Config, config processdeployment.Config) *SmartServiceRepoMock {
+	return &SmartServiceRepoMock{libConfig: libConfig, config: config}
 }
 
 type SmartServiceRepoMock struct {
 	requestsLog []Request
 	mux         sync.Mutex
-	config      configuration.Config
+	libConfig   configuration.Config
+	config      processdeployment.Config
 }
 
 func (this *SmartServiceRepoMock) PopRequestLog() []Request {

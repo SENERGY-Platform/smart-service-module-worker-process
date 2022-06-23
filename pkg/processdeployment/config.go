@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-package smartservicerepository
+package processdeployment
 
-import (
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/auth"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/configuration"
-)
-
-type SmartServiceRepository struct {
-	config configuration.Config
-	auth   *auth.Auth
-}
-
-func New(config configuration.Config, auth *auth.Auth) *SmartServiceRepository {
-	return &SmartServiceRepository{config: config, auth: auth}
+type Config struct {
+	ProcessDeploymentUrl    string `json:"process_deployment_url"`
+	ProcessDeploymentSource string `json:"process_deployment_source"`
+	WorkerParamPrefix       string `json:"worker_param_prefix"`
 }

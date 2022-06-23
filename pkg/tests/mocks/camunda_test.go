@@ -17,7 +17,7 @@
 package mocks
 
 import (
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/model"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 	"testing"
 )
 

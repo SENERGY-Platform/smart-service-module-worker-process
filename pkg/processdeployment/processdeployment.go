@@ -19,26 +19,28 @@ package processdeployment
 import (
 	"errors"
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/auth"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/configuration"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/model"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 	"log"
 	"net/url"
 	"runtime/debug"
 )
 
-func New(config configuration.Config, auth *auth.Auth, smartServiceRepo SmartServiceRepo) *ProcessDeployment {
-	return &ProcessDeployment{config: config, auth: auth, smartServiceRepo: smartServiceRepo}
+func New(config Config, libConfig configuration.Config, auth *auth.Auth, smartServiceRepo SmartServiceRepo) *ProcessDeployment {
+	return &ProcessDeployment{config: config, libConfig: libConfig, auth: auth, smartServiceRepo: smartServiceRepo}
 }
 
 type ProcessDeployment struct {
-	config           configuration.Config
+	config           Config
+	libConfig        configuration.Config
 	auth             *auth.Auth
 	smartServiceRepo SmartServiceRepo
 }
 
 type SmartServiceRepo interface {
 	GetInstanceUser(instanceId string) (userId string, err error)
+	UseModuleDeleteInfo(info model.ModuleDeleteInfo) error
 }
 
 func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []model.Module, outputs map[string]interface{}, err error) {
@@ -84,7 +86,7 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 					Url:    this.config.ProcessDeploymentUrl + "/v3/deployments/" + url.PathEscape(resultDeployment.Id),
 					UserId: userId,
 				},
-				ModuleType: this.config.CamundaWorkerTopic,
+				ModuleType: this.libConfig.CamundaWorkerTopic,
 				ModuleData: moduleData,
 			},
 		}},
@@ -96,7 +98,7 @@ func (this *ProcessDeployment) Undo(modules []model.Module, reason error) {
 	log.Println("UNDO:", reason)
 	for _, module := range modules {
 		if module.DeleteInfo != nil {
-			err := this.useModuleDeleteInfo(*module.DeleteInfo)
+			err := this.smartServiceRepo.UseModuleDeleteInfo(*module.DeleteInfo)
 			if err != nil {
 				log.Println("ERROR:", err)
 				debug.PrintStack()

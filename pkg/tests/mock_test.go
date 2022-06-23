@@ -20,9 +20,10 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/configuration"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/model"
+	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/processdeployment"
 	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/tests/mocks"
 	"io/ioutil"
 	"reflect"
@@ -40,7 +41,7 @@ func TestWithMocks(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	_, depl, camunda, repo, err := prepareMocks(ctx, wg)
+	_, _, depl, camunda, repo, err := prepareMocks(ctx, wg)
 	if err != nil {
 		t.Error(err)
 		return
@@ -61,25 +62,29 @@ func TestWithMocks(t *testing.T) {
 	}
 }
 
-func prepareMocks(ctx context.Context, wg *sync.WaitGroup) (conf configuration.Config, deployment *mocks.DeploymentMock, camunda *mocks.CamundaMock, smartServiceRepo *mocks.SmartServiceRepoMock, err error) {
-	conf, err = configuration.Load("../../config.json")
+func prepareMocks(ctx context.Context, wg *sync.WaitGroup) (libConf configuration.Config, conf processdeployment.Config, deployment *mocks.DeploymentMock, camunda *mocks.CamundaMock, smartServiceRepo *mocks.SmartServiceRepoMock, err error) {
+	libConf, err = configuration.LoadLibConfig("../../config.json")
 	if err != nil {
 		return
 	}
-	conf.CamundaWorkerWaitDurationInMs = 200
+	conf, err = configuration.Load[processdeployment.Config]("../../config.json")
+	if err != nil {
+		return
+	}
+	libConf.CamundaWorkerWaitDurationInMs = 200
 
 	deployment = mocks.NewDeploymentMock()
 	conf.ProcessDeploymentUrl = deployment.Start(ctx, wg)
 
 	camunda = mocks.NewCamundaMock()
-	conf.CamundaUrl = camunda.Start(ctx, wg)
+	libConf.CamundaUrl = camunda.Start(ctx, wg)
 
-	smartServiceRepo = mocks.NewSmartServiceRepoMock(conf)
-	conf.SmartServiceRepositoryUrl = smartServiceRepo.Start(ctx, wg)
+	smartServiceRepo = mocks.NewSmartServiceRepoMock(libConf, conf)
+	libConf.SmartServiceRepositoryUrl = smartServiceRepo.Start(ctx, wg)
 
-	conf.AuthEndpoint = mocks.Keycloak(ctx, wg)
+	libConf.AuthEndpoint = mocks.Keycloak(ctx, wg)
 
-	err = pkg.Start(ctx, wg, conf)
+	err = pkg.Start(ctx, wg, conf, libConf)
 
 	return
 }

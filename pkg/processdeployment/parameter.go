@@ -22,7 +22,7 @@ import (
 	"fmt"
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deviceselectionmodel"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/model"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 )
 
 func (this *ProcessDeployment) getModuleData(task model.CamundaExternalTask) (result map[string]interface{}) {
