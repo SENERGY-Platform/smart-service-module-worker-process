@@ -16,4 +16,4 @@ require (
 	github.com/google/uuid v1.1.1 // indirect
 )
 
-replace github.com/SENERGY-Platform/smart-service-module-worker-lib => ../smart-service-module-worker-lib
+//replace github.com/SENERGY-Platform/smart-service-module-worker-lib => ../smart-service-module-worker-lib
