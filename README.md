@@ -3,7 +3,7 @@
 
 ### Process-Model-Id
 
-- Desc: sets the name of the process deployment
+- Desc: defines which process-model should be de deployed
 - Variable-Name-Template: `{{config.WorkerParamPrefix}}.process_model_id`
 - Variable-Name-Example: `process_deployment.process_model_id`
 - Value: string
