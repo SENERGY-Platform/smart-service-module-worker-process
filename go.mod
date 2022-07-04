@@ -3,8 +3,8 @@ module github.com/SENERGY-Platform/smart-service-module-worker-process
 go 1.18
 
 require (
-	github.com/SENERGY-Platform/process-deployment v0.0.0-20220530063634-9bbc7010f749
-	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20220623113716-c01f799f528d
+	github.com/SENERGY-Platform/process-deployment v0.0.0-20220704073237-509c847c7fe5
+	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20220704125759-769f480d942b
 	github.com/julienschmidt/httprouter v1.3.0
 )
 

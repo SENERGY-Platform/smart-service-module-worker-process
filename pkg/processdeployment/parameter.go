@@ -117,6 +117,19 @@ func (this *ProcessDeployment) setSelection(task model.CamundaExternalTask, elem
 	if selection.DeviceGroupSelection != nil {
 		elementSelection.SelectedDeviceGroupId = &selection.DeviceGroupSelection.Id
 	}
+	if selection.GenericEventSource != nil {
+		elementSelection.SelectedGenericEventSource = &deploymentmodel.GenericEventSource{
+			FilterType: selection.GenericEventSource.FilterType,
+			FilterIds:  selection.GenericEventSource.FilterIds,
+			Topic:      selection.GenericEventSource.Topic,
+		}
+		elementSelection.SelectedPath = &deviceselectionmodel.PathOption{
+			Path: selection.GenericEventSource.Path,
+		}
+		if selection.GenericEventSource.CharacteristicId != nil {
+			elementSelection.SelectedPath.CharacteristicId = *selection.GenericEventSource.CharacteristicId
+		}
+	}
 	return nil
 }
 
