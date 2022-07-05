@@ -38,3 +38,17 @@
 - Variable-Name-Example: `process_deployment.Task_1uopw0b.parameter.inputs.r`
 - Value: any; strings will be used as is; other types will be marshalled to as json
 
+### Event-Value
+
+- Desc: sets comparison value for message event
+- Variable-Name-Template: `{{config.WorkerParamPrefix}}.{{element.BpmnId}}.event.value`
+- Variable-Name-Example: `process_deployment.StartEvent_1.event.value`
+- Value: string
+
+### Event-Flow-ID
+
+- Desc: sets id of flow to be deployed as event-filter
+- Variable-Name-Template: `{{config.WorkerParamPrefix}}.{{element.BpmnId}}.event.flow_id`
+- Variable-Name-Example: `process_deployment.StartEvent_1.event.flow_id`
+- Value: string
+

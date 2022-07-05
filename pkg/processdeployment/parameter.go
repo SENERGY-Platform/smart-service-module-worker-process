@@ -158,6 +158,30 @@ func (this *ProcessDeployment) setParameter(task model.CamundaExternalTask, elem
 	return nil
 }
 
+func (this *ProcessDeployment) setMsgEventConfig(task model.CamundaExternalTask, element *deploymentmodel.Element) error {
+	if element.MessageEvent == nil {
+		return nil
+	}
+	parameterName := this.config.WorkerParamPrefix + element.BpmnId + ".event.value"
+	parameterVariable, ok := task.Variables[parameterName]
+	if ok {
+		element.MessageEvent.Value, ok = parameterVariable.Value.(string)
+		if !ok {
+			return fmt.Errorf("unable to interpret %v parameter as string", parameterName)
+		}
+	}
+	parameterName = this.config.WorkerParamPrefix + element.BpmnId + ".event.flow_id"
+	parameterVariable, ok = task.Variables[parameterName]
+	if !ok {
+		return fmt.Errorf("missing %v parameter", parameterName)
+	}
+	element.MessageEvent.FlowId, ok = parameterVariable.Value.(string)
+	if !ok {
+		return fmt.Errorf("unable to interpret %v parameter as string", parameterName)
+	}
+	return nil
+}
+
 func (this *ProcessDeployment) setTime(task model.CamundaExternalTask, element *deploymentmodel.Element) error {
 	if element.TimeEvent == nil {
 		return nil

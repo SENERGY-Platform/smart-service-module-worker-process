@@ -15,6 +15,12 @@
             },
             "process_deployment.name": {
                 "value": "test-deployment-name-updated"
+            },
+            "process_deployment.StartEvent_1.event.flow_id": {
+                "value": "flow-id-1"
+            },
+            "process_deployment.StartEvent_1.event.value": {
+                "value": "foobar"
             }
         }
     }

@@ -115,6 +115,7 @@ func (this *ProcessDeployment) UseVariables(task model.CamundaExternalTask, depl
 	handler := []func(task model.CamundaExternalTask, element *deploymentmodel.Element) error{
 		this.setSelection,
 		this.setParameter,
+		this.setMsgEventConfig,
 		this.setTime,
 	}
 	for i, element := range deployment.Elements {

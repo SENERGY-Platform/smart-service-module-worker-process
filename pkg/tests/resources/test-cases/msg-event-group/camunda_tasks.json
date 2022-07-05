@@ -18,6 +18,12 @@
             },
             "process_deployment.StartEvent_1.selection": {
                 "value": "{\"device_group_selection\":{\"id\":\"group_1\"}}"
+            },
+            "process_deployment.StartEvent_1.event.flow_id": {
+                "value": "flow-id-1"
+            },
+            "process_deployment.StartEvent_1.event.value": {
+                "value": "foobar"
             }
         }
     }
