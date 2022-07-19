@@ -52,3 +52,9 @@
 - Variable-Name-Example: `process_deployment.StartEvent_1.event.flow_id`
 - Value: string
 
+### Time
+
+- Desc: sets time of time-event
+- Variable-Name-Template: `{{config.WorkerParamPrefix}}.{{element.BpmnId}}.time`
+- Variable-Name-Example: `process_deployment.StartEvent_1.time`
+- Value: string
