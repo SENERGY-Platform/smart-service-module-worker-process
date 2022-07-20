@@ -1,3 +1,9 @@
+## Outputs
+
+### Deployment-Id
+
+- Desc: id of created deployment
+- Variable-Name: process_deployment_id
 
 ## Camunda-Input-Variables
 
