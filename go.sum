@@ -4,6 +4,8 @@ github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-2022070412575
 github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20220704125759-769f480d942b/go.mod h1:o7mZ2VanXVpRrT3JmDc3ohIXn20fBrCb6lqXDEuxApE=
 github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20220706062144-a4704582ea25 h1:iWzp6TtBU8/B6jFj778W9qBWxRAYrVs53yemttAsr6c=
 github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20220706062144-a4704582ea25/go.mod h1:o7mZ2VanXVpRrT3JmDc3ohIXn20fBrCb6lqXDEuxApE=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20220805102514-10fe40062139 h1:GVwOUbyc98gnsP5VPqEwpJj670xZ9Fvnu9FNAohUILE=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20220805102514-10fe40062139/go.mod h1:o7mZ2VanXVpRrT3JmDc3ohIXn20fBrCb6lqXDEuxApE=
 github.com/beevik/etree v1.1.0 h1:T0xke/WvNtMoCqgzPhkX2r4rjY3GDZFi+FjpRZY2Jbs=
 github.com/beevik/etree v1.1.0/go.mod h1:r8Aw8JqVegEf0w2fDnATrX9VpkMcyFeM0FhwO62wh+A=
 github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
