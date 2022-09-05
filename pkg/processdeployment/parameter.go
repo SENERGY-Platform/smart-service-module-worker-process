@@ -23,6 +23,7 @@ import (
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deviceselectionmodel"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
+	"strconv"
 )
 
 func (this *ProcessDeployment) getModuleData(task model.CamundaExternalTask) (result map[string]interface{}) {
@@ -179,6 +180,24 @@ func (this *ProcessDeployment) setMsgEventConfig(task model.CamundaExternalTask,
 	if !ok {
 		return fmt.Errorf("unable to interpret %v parameter as string", parameterName)
 	}
+
+	parameterName = this.config.WorkerParamPrefix + element.BpmnId + ".event.use_marshaller"
+	parameterVariable, ok = task.Variables[parameterName]
+	if ok {
+		switch v := parameterVariable.Value.(type) {
+		case string:
+			var err error
+			element.MessageEvent.UseMarshaller, err = strconv.ParseBool(v)
+			if err != nil {
+				return fmt.Errorf("unable to handle %v parameter: %w", parameterName, err)
+			}
+		case bool:
+			element.MessageEvent.UseMarshaller = v
+		default:
+			return fmt.Errorf("unable to handle %v parameter with given type", parameterName)
+		}
+	}
+
 	return nil
 }
 
