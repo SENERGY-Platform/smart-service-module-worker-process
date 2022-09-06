@@ -51,6 +51,13 @@
 - Variable-Name-Example: `process_deployment.StartEvent_1.event.value`
 - Value: string
 
+### Event-UseMarshaller
+
+- Desc: optional; decides if the event-filter should use the marshaller
+- Variable-Name-Template: `{{config.WorkerParamPrefix}}.{{element.BpmnId}}.event.use_marshaller`
+- Variable-Name-Example: `process_deployment.StartEvent_1.event.use_marshaller`
+- Value: boolean || json.Marshal(boolean)
+
 ### Event-Flow-ID
 
 - Desc: sets id of flow to be deployed as event-filter
