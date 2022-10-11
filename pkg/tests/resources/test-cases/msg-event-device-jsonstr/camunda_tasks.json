@@ -1,0 +1,30 @@
+[
+    {
+        "id": "task1",
+        "processInstanceId": "process-instance-1",
+        "processDefinitionId": "process-definition-1",
+        "variables": {
+            "foo": {
+                "value": "bar"
+            },
+            "process_deployment.module_data": {
+                "value": "{\"additional-info\": 42}"
+            },
+            "process_deployment.process_model_id": {
+                "value": "test-model-id"
+            },
+            "process_deployment.name": {
+                "value": "test-deployment-name-updated"
+            },
+            "process_deployment.StartEvent_1.selection": {
+                "value": "{\"device_selection\":{\"device_id\":\"device_1\",\"service_id\":\"s1\",\"characteristic_id\":\"test-characteristic\",\"path\":\"root.value_s1.v1\"}}"
+            },
+            "process_deployment.StartEvent_1.event.flow_id": {
+                "value": "flow-id-1"
+            },
+            "process_deployment.StartEvent_1.event.value": {
+                "value": "\"foobar\""
+            }
+        }
+    }
+]

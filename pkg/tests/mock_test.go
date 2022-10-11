@@ -26,6 +26,7 @@ import (
 	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/processdeployment"
 	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/tests/mocks"
 	"io/ioutil"
+	"os"
 	"reflect"
 	"sync"
 	"testing"
@@ -141,7 +142,7 @@ func mockTest(t *testing.T, depl *mocks.DeploymentMock, camunda *mocks.CamundaMo
 		return
 	}
 
-	expectedDeploymentRequestsFile, err := ioutil.ReadFile(RESOURCE_BASE_DIR + name + "/expected_deployment_requests.json")
+	expectedDeploymentRequestsFile, err := os.ReadFile(RESOURCE_BASE_DIR + name + "/expected_deployment_requests.json")
 	if err != nil {
 		t.Error(err)
 		return
@@ -153,7 +154,7 @@ func mockTest(t *testing.T, depl *mocks.DeploymentMock, camunda *mocks.CamundaMo
 		return
 	}
 
-	expectedSmartServiceRepoRequestsFile, err := ioutil.ReadFile(RESOURCE_BASE_DIR + name + "/expected_smart_service_repo_requests.json")
+	expectedSmartServiceRepoRequestsFile, err := os.ReadFile(RESOURCE_BASE_DIR + name + "/expected_smart_service_repo_requests.json")
 	if err != nil {
 		t.Error(err)
 		return
@@ -165,7 +166,7 @@ func mockTest(t *testing.T, depl *mocks.DeploymentMock, camunda *mocks.CamundaMo
 		return
 	}
 
-	tasksFile, err := ioutil.ReadFile(RESOURCE_BASE_DIR + name + "/camunda_tasks.json")
+	tasksFile, err := os.ReadFile(RESOURCE_BASE_DIR + name + "/camunda_tasks.json")
 	if err != nil {
 		t.Error(err)
 		return
@@ -190,12 +191,14 @@ func mockTest(t *testing.T, depl *mocks.DeploymentMock, camunda *mocks.CamundaMo
 	}
 
 	if !reflect.DeepEqual(expectedDeploymentRequests, actualDeplRequests) {
-		temp, _ := json.Marshal(actualDeplRequests)
-		t.Error(string(temp))
+		e, _ := json.Marshal(expectedDeploymentRequests)
+		a, _ := json.Marshal(actualDeplRequests)
+		t.Error("\n", string(e), "\n", string(a))
 	}
 
 	if !reflect.DeepEqual(expectedSmartServiceRepoRequests, actualSmartServiceRepoRequests) {
-		temp, _ := json.Marshal(actualSmartServiceRepoRequests)
-		t.Error(string(temp))
+		e, _ := json.Marshal(expectedSmartServiceRepoRequests)
+		a, _ := json.Marshal(actualSmartServiceRepoRequests)
+		t.Error("\n", string(e), "\n", string(a))
 	}
 }

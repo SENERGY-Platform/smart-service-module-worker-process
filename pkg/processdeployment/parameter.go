@@ -165,11 +165,18 @@ func (this *ProcessDeployment) setMsgEventConfig(task model.CamundaExternalTask,
 	}
 	parameterName := this.config.WorkerParamPrefix + element.BpmnId + ".event.value"
 	parameterVariable, ok := task.Variables[parameterName]
-	if ok {
-		element.MessageEvent.Value, ok = parameterVariable.Value.(string)
-		if !ok {
-			return fmt.Errorf("unable to interpret %v parameter as string", parameterName)
+	if ok && parameterVariable.Value != nil {
+		var err error
+		element.MessageEvent.Value, err = ensureJsonString(parameterVariable.Value)
+		if err != nil {
+			return err
 		}
+		/*
+			element.MessageEvent.Value, ok = parameterVariable.Value.(string)
+			if !ok {
+				return fmt.Errorf("unable to interpret %v = %T %v parameter as string", parameterName, parameterVariable.Value, parameterVariable.Value)
+			}
+		*/
 	}
 	parameterName = this.config.WorkerParamPrefix + element.BpmnId + ".event.flow_id"
 	parameterVariable, ok = task.Variables[parameterName]
@@ -199,6 +206,20 @@ func (this *ProcessDeployment) setMsgEventConfig(task model.CamundaExternalTask,
 	}
 
 	return nil
+}
+
+func ensureJsonString(value interface{}) (result string, err error) {
+	if str, ok := value.(string); ok {
+		var temp interface{}
+		err = json.Unmarshal([]byte(str), &temp)
+		if err == nil {
+			return str, nil
+		}
+		buf, err := json.Marshal(str)
+		return string(buf), err
+	}
+	buf, err := json.Marshal(value)
+	return string(buf), err
 }
 
 func (this *ProcessDeployment) setTime(task model.CamundaExternalTask, element *deploymentmodel.Element) error {
