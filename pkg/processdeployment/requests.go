@@ -30,7 +30,7 @@ import (
 )
 
 func (this *ProcessDeployment) PrepareRequest(token auth.Token, processId string) (deployment deploymentmodel.Deployment, err error) {
-	req, err := http.NewRequest("GET", this.config.ProcessDeploymentUrl+"/v3/prepared-deployments/"+url.PathEscape(processId), nil)
+	req, err := http.NewRequest("GET", this.config.ProcessDeploymentUrl+"/v3/prepared-deployments/"+url.PathEscape(processId)+"?with_options=false", nil)
 	if err != nil {
 		return deployment, err
 	}
@@ -62,6 +62,15 @@ func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmod
 	}
 	if len(query) > 0 {
 		queryStr = "?" + query.Encode()
+	}
+	for i, element := range deployment.Elements {
+		if element.Task != nil && len(element.Task.Selection.SelectionOptions) > 0 {
+			element.Task.Selection.SelectionOptions = []deploymentmodel.SelectionOption{}
+		}
+		if element.MessageEvent != nil && len(element.MessageEvent.Selection.SelectionOptions) > 0 {
+			element.MessageEvent.Selection.SelectionOptions = []deploymentmodel.SelectionOption{}
+		}
+		deployment.Elements[i] = element
 	}
 	body := new(bytes.Buffer)
 	err = json.NewEncoder(body).Encode(deployment)
