@@ -25,7 +25,6 @@ import (
 	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg"
 	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/processdeployment"
 	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/tests/mocks"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"sync"
@@ -36,19 +35,7 @@ import (
 const RESOURCE_BASE_DIR = "./resources/test-cases/"
 
 func TestWithMocks(t *testing.T) {
-	wg := &sync.WaitGroup{}
-	defer wg.Wait()
-
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	_, _, depl, camunda, repo, err := prepareMocks(ctx, wg)
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	infos, err := ioutil.ReadDir(RESOURCE_BASE_DIR)
+	infos, err := os.ReadDir(RESOURCE_BASE_DIR)
 	if err != nil {
 		t.Error(err)
 		return
@@ -57,7 +44,7 @@ func TestWithMocks(t *testing.T) {
 		name := info.Name()
 		if info.IsDir() && isValidaForMockTest(RESOURCE_BASE_DIR+name) {
 			t.Run(name, func(t *testing.T) {
-				mockTest(t, depl, camunda, repo, name)
+				mockTest(t, name)
 			})
 		}
 	}
@@ -98,7 +85,7 @@ func isValidaForMockTest(dir string) bool {
 		"expected_smart_service_repo_requests.json",
 		"prepared_deployments.json",
 	}
-	infos, err := ioutil.ReadDir(dir)
+	infos, err := os.ReadDir(dir)
 	if err != nil {
 		panic(err)
 	}
@@ -116,8 +103,20 @@ func isValidaForMockTest(dir string) bool {
 	return true
 }
 
-func mockTest(t *testing.T, depl *mocks.DeploymentMock, camunda *mocks.CamundaMock, repo *mocks.SmartServiceRepoMock, name string) {
-	preparedDeploymentsFile, err := ioutil.ReadFile(RESOURCE_BASE_DIR + name + "/prepared_deployments.json")
+func mockTest(t *testing.T, name string) {
+	wg := &sync.WaitGroup{}
+	defer wg.Wait()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	_, _, depl, camunda, repo, err := prepareMocks(ctx, wg)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	preparedDeploymentsFile, err := os.ReadFile(RESOURCE_BASE_DIR + name + "/prepared_deployments.json")
 	if err != nil {
 		t.Error(err)
 		return
@@ -130,7 +129,7 @@ func mockTest(t *testing.T, depl *mocks.DeploymentMock, camunda *mocks.CamundaMo
 	}
 	depl.SetPreparedDeployments(preparedDepl)
 
-	expectedCamundaRequestsFile, err := ioutil.ReadFile(RESOURCE_BASE_DIR + name + "/expected_camunda_requests.json")
+	expectedCamundaRequestsFile, err := os.ReadFile(RESOURCE_BASE_DIR + name + "/expected_camunda_requests.json")
 	if err != nil {
 		t.Error(err)
 		return
