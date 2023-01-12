@@ -17,7 +17,12 @@
 package processdeployment
 
 type Config struct {
-	ProcessDeploymentUrl    string `json:"process_deployment_url"`
-	ProcessDeploymentSource string `json:"process_deployment_source"`
-	WorkerParamPrefix       string `json:"worker_param_prefix"`
+	ProcessDeploymentUrl       string `json:"process_deployment_url"`
+	FogProcessDeploymentUrl    string `json:"fog_process_deployment_url"`
+	FogProcessSyncUrl          string `json:"fog_process_sync_url"`
+	DeviceRepositoryUrl        string `json:"device_repository_url"`
+	AllowEventsInFogProcesses  bool   `json:"allow_events_in_fog_processes"`
+	AllowImportsInFogProcesses bool   `json:"allow_imports_in_fog_processes"`
+	ProcessDeploymentSource    string `json:"process_deployment_source"`
+	WorkerParamPrefix          string `json:"worker_param_prefix"`
 }

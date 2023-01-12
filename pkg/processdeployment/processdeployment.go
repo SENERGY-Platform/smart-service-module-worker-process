@@ -17,14 +17,19 @@
 package processdeployment
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
+	"io"
 	"log"
+	"net/http"
 	"net/url"
 	"runtime/debug"
+	"time"
 )
 
 func New(config Config, libConfig configuration.Config, auth *auth.Auth, smartServiceRepo SmartServiceRepo) *ProcessDeployment {
@@ -63,12 +68,20 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 		log.Println("ERROR: unable to prepare process deployment", err)
 		return modules, outputs, err
 	}
+
 	err = this.UseVariables(task, &deployment)
 	if err != nil {
 		log.Println("ERROR: unable to use variables", err)
 		return modules, outputs, err
 	}
-	resultDeployment, err := this.Deploy(token, deployment, true)
+
+	isFogDeployment, hubId, err := this.IsFogDeployment(token, task, deployment)
+	if err != nil {
+		log.Println("ERROR: unable to use variables", err)
+		return modules, outputs, err
+	}
+
+	resultDeployment, err := this.Deploy(token, deployment, true, hubId)
 	if err != nil {
 		log.Println("ERROR: unable to deploy process", err)
 		return modules, outputs, err
@@ -77,20 +90,35 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 	moduleData := this.getModuleData(task)
 	moduleData["process_deployment_name"] = resultDeployment.Name
 	moduleData["process_deployment_id"] = resultDeployment.Id
+	if isFogDeployment {
+		moduleData["is_fog_deployment"] = true
+		moduleData["fog_hub"] = hubId
+	}
+
+	deleteEndpoint := this.config.ProcessDeploymentUrl + "/v3/deployments/" + url.PathEscape(resultDeployment.Id)
+	if isFogDeployment {
+		deleteEndpoint = this.config.FogProcessDeploymentUrl + "/deployments/" + url.PathEscape(hubId) + "/" + url.PathEscape(resultDeployment.Id)
+	}
+
+	outputs = map[string]interface{}{"process_deployment_id": resultDeployment.Id}
+	if isFogDeployment {
+		outputs["is_fog_deployment"] = true
+		outputs["fog_hub"] = hubId
+	}
 
 	return []model.Module{{
 			Id:               this.getModuleId(task),
 			ProcesInstanceId: task.ProcessInstanceId,
 			SmartServiceModuleInit: model.SmartServiceModuleInit{
 				DeleteInfo: &model.ModuleDeleteInfo{
-					Url:    this.config.ProcessDeploymentUrl + "/v3/deployments/" + url.PathEscape(resultDeployment.Id),
+					Url:    deleteEndpoint,
 					UserId: userId,
 				},
 				ModuleType: this.libConfig.CamundaWorkerTopic,
 				ModuleData: moduleData,
 			},
 		}},
-		map[string]interface{}{"process_deployment_id": resultDeployment.Id},
+		outputs,
 		err
 }
 
@@ -132,4 +160,159 @@ func (this *ProcessDeployment) UseVariables(task model.CamundaExternalTask, depl
 
 func (this *ProcessDeployment) getModuleId(task model.CamundaExternalTask) string {
 	return task.ProcessInstanceId + "." + task.Id
+}
+
+func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.CamundaExternalTask, deployment deploymentmodel.Deployment) (isFogDeployment bool, hubId string, err error) {
+	preferFogDeployment, err := this.getPreferFogDeployment(task)
+	if err != nil {
+		return false, "", err
+	}
+	if !preferFogDeployment {
+		return false, "", nil
+	}
+
+	devices := []string{}
+	groups := []string{}
+	imports := []string{}
+	usesEvents := false
+	for _, element := range deployment.Elements {
+		if element.Task != nil {
+			if element.Task.Selection.SelectedDeviceId != nil {
+				devices = append(devices, *element.Task.Selection.SelectedDeviceId)
+			}
+			if element.Task.Selection.SelectedDeviceGroupId != nil {
+				groups = append(groups, *element.Task.Selection.SelectedDeviceGroupId)
+			}
+			if element.Task.Selection.SelectedImportId != nil {
+				imports = append(imports, *element.Task.Selection.SelectedImportId)
+			}
+		}
+		if element.MessageEvent != nil {
+			usesEvents = true
+			if element.MessageEvent.Selection.SelectedDeviceId != nil {
+				devices = append(devices, *element.MessageEvent.Selection.SelectedDeviceId)
+			}
+			if element.MessageEvent.Selection.SelectedDeviceGroupId != nil {
+				groups = append(groups, *element.MessageEvent.Selection.SelectedDeviceGroupId)
+			}
+			if element.MessageEvent.Selection.SelectedImportId != nil {
+				imports = append(imports, *element.MessageEvent.Selection.SelectedImportId)
+			}
+		}
+	}
+	if !this.config.AllowEventsInFogProcesses && usesEvents {
+		return false, "", nil
+	}
+	if !this.config.AllowImportsInFogProcesses && len(imports) > 0 {
+		return false, "", nil
+	}
+	for _, groupId := range groups {
+		group, err := this.GetGroup(token, groupId)
+		if err != nil {
+			return false, "", err
+		}
+		devices = append(devices, group.DeviceIds...)
+	}
+	networks, err := this.GetFogNetworks(token)
+	if err != nil {
+		return false, "", err
+	}
+	if len(devices) == 0 {
+		log.Println("WARNING: process deployments without devices wont be run in fog")
+		return false, "", nil
+	}
+	for _, network := range networks {
+		networkIndex := map[string]bool{}
+		for _, id := range network.DeviceIds {
+			networkIndex[id] = true
+		}
+		missingDeviceInNetwork := false
+		for _, id := range devices {
+			if !networkIndex[id] {
+				missingDeviceInNetwork = true
+				break
+			}
+		}
+		if !missingDeviceInNetwork {
+			return true, network.Id, nil
+		}
+	}
+	return false, "", nil
+}
+
+type Hub struct {
+	Id             string   `json:"id"`
+	Name           string   `json:"name"`
+	DeviceLocalIds []string `json:"device_local_ids"`
+	DeviceIds      []string `json:"device_ids"`
+}
+
+func (this *ProcessDeployment) GetFogNetworks(token auth.Token) (result []Hub, err error) {
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	req, err := http.NewRequest(
+		"GET",
+		this.config.FogProcessSyncUrl+"/networks",
+		nil,
+	)
+	if err != nil {
+		debug.PrintStack()
+		return result, err
+	}
+	req.Header.Set("Authorization", token.Jwt())
+
+	resp, err := client.Do(req)
+	if err != nil {
+		debug.PrintStack()
+		return result, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 300 {
+		debug.PrintStack()
+		temp, _ := io.ReadAll(resp.Body)
+		return result, fmt.Errorf("unexpected statuscode %v: %v", resp.StatusCode, string(temp))
+	}
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	_, _ = io.ReadAll(resp.Body)
+	return result, err
+}
+
+type DeviceGroup struct {
+	Id        string   `json:"id"`
+	Name      string   `json:"name"`
+	DeviceIds []string `json:"device_ids"`
+}
+
+func (this *ProcessDeployment) GetGroup(token auth.Token, id string) (result DeviceGroup, err error) {
+	client := http.Client{
+		Timeout: 5 * time.Second,
+	}
+	req, err := http.NewRequest(
+		"GET",
+		this.config.DeviceRepositoryUrl+"/device-groups",
+		nil,
+	)
+	if err != nil {
+		debug.PrintStack()
+		return result, err
+	}
+	req.Header.Set("Authorization", token.Jwt())
+
+	resp, err := client.Do(req)
+	if err != nil {
+		debug.PrintStack()
+		return result, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode >= 300 {
+		debug.PrintStack()
+		temp, _ := io.ReadAll(resp.Body)
+		return result, fmt.Errorf("unexpected statuscode %v: %v", resp.StatusCode, string(temp))
+	}
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	_, _ = io.ReadAll(resp.Body)
+	return result, err
 }

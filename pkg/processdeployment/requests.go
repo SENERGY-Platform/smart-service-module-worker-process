@@ -50,7 +50,7 @@ func (this *ProcessDeployment) PrepareRequest(token auth.Token, processId string
 	return deployment, err
 }
 
-func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmodel.Deployment, allowMissingServiceSelection bool) (result deploymentmodel.Deployment, err error) {
+func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmodel.Deployment, allowMissingServiceSelection bool, hubId string) (result deploymentmodel.Deployment, err error) {
 	queryStr := ""
 	query := url.Values{}
 	source := this.config.ProcessDeploymentSource
@@ -79,7 +79,11 @@ func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmod
 		debug.PrintStack()
 		return result, err
 	}
-	req, err := http.NewRequest("POST", this.config.ProcessDeploymentUrl+"/v3/deployments"+queryStr, body)
+	endpoint := this.config.ProcessDeploymentUrl + "/v3/deployments" + queryStr
+	if hubId != "" {
+		endpoint = this.config.FogProcessDeploymentUrl + "/deployments/" + url.PathEscape(hubId) + queryStr
+	}
+	req, err := http.NewRequest("POST", endpoint, body)
 	if err != nil {
 		return result, err
 	}

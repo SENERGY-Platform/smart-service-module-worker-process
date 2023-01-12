@@ -67,6 +67,27 @@ func (this *ProcessDeployment) getProcessName(task model.CamundaExternalTask) st
 	return result
 }
 
+func (this *ProcessDeployment) getPreferFogDeployment(task model.CamundaExternalTask) (bool, error) {
+	variable, ok := task.Variables[this.config.WorkerParamPrefix+"prefer_fog_deployment"]
+	if !ok {
+		return false, nil
+	}
+	switch v := variable.Value.(type) {
+	case string:
+		result, err := strconv.ParseBool(v)
+		if err != nil {
+			err = fmt.Errorf("unexpected value in %v: %v (%w)", this.config.WorkerParamPrefix+"prefer_fog_deployment", v, err)
+			return false, err
+		}
+		return result, nil
+	case bool:
+		return v, nil
+	default:
+		err := fmt.Errorf("unexpected value in %v: %v", this.config.WorkerParamPrefix+"prefer_fog_deployment", v)
+		return false, err
+	}
+}
+
 func (this *ProcessDeployment) setSelection(task model.CamundaExternalTask, element *deploymentmodel.Element) error {
 	var elementSelection *deploymentmodel.Selection
 	switch {

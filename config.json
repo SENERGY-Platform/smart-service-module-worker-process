@@ -1,7 +1,11 @@
 {
     "smart_service_repository_url": "",
-    "process_deployment_url": "",
     "camunda_url": "",
+    "process_deployment_url": "",
+    "fog_process_deployment_url": "",
+    "device_repository_url": "",
+    "allow_events_in_fog_processes": true,
+    "allow_imports_in_fog_processes": false,
 
     "camunda_worker_id": "process_deployment",
     "camunda_worker_topic": "process_deployment",
