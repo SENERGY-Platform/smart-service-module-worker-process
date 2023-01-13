@@ -50,7 +50,7 @@ func TestWithMocks(t *testing.T) {
 	}
 }
 
-func prepareMocks(ctx context.Context, wg *sync.WaitGroup) (libConf configuration.Config, conf processdeployment.Config, deployment *mocks.DeploymentMock, camunda *mocks.CamundaMock, smartServiceRepo *mocks.SmartServiceRepoMock, err error) {
+func prepareMocks(ctx context.Context, wg *sync.WaitGroup, responses []mocks.Response) (libConf configuration.Config, conf processdeployment.Config, deployment *mocks.DeploymentMock, fog *mocks.FogDeploymentMock, camunda *mocks.CamundaMock, smartServiceRepo *mocks.SmartServiceRepoMock, err error) {
 	libConf, err = configuration.LoadLibConfig("../../config.json")
 	if err != nil {
 		return
@@ -64,6 +64,9 @@ func prepareMocks(ctx context.Context, wg *sync.WaitGroup) (libConf configuratio
 	deployment = mocks.NewDeploymentMock()
 	conf.ProcessDeploymentUrl = deployment.Start(ctx, wg)
 
+	fog = mocks.NewFogDeploymentMock()
+	conf.FogProcessDeploymentUrl = fog.Start(ctx, wg)
+
 	camunda = mocks.NewCamundaMock()
 	libConf.CamundaUrl = camunda.Start(ctx, wg)
 
@@ -71,6 +74,10 @@ func prepareMocks(ctx context.Context, wg *sync.WaitGroup) (libConf configuratio
 	libConf.SmartServiceRepositoryUrl = smartServiceRepo.Start(ctx, wg)
 
 	libConf.AuthEndpoint = mocks.Keycloak(ctx, wg)
+
+	responsesUrl := mocks.MockResponses(ctx, wg, responses)
+	conf.DeviceRepositoryUrl = responsesUrl
+	conf.FogProcessSyncUrl = responsesUrl
 
 	err = pkg.Start(ctx, wg, conf, libConf)
 
@@ -110,7 +117,17 @@ func mockTest(t *testing.T, name string) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	_, _, depl, camunda, repo, err := prepareMocks(ctx, wg)
+	responses := []mocks.Response{}
+	responsesStr, err := os.ReadFile(RESOURCE_BASE_DIR + name + "/responses.json")
+	if err == nil {
+		err = json.Unmarshal(responsesStr, &responses)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+	}
+
+	_, _, depl, fog, camunda, repo, err := prepareMocks(ctx, wg, responses)
 	if err != nil {
 		t.Error(err)
 		return
@@ -153,6 +170,16 @@ func mockTest(t *testing.T, name string) {
 		return
 	}
 
+	expectedFogDeploymentRequests := []mocks.Request{}
+	expectedFogDeploymentRequestsFile, err := os.ReadFile(RESOURCE_BASE_DIR + name + "/expected_fog_deployment_requests.json")
+	if err == nil {
+		err = json.Unmarshal(expectedFogDeploymentRequestsFile, &expectedFogDeploymentRequests)
+		if err != nil {
+			t.Error(err)
+			return
+		}
+	}
+
 	expectedSmartServiceRepoRequestsFile, err := os.ReadFile(RESOURCE_BASE_DIR + name + "/expected_smart_service_repo_requests.json")
 	if err != nil {
 		t.Error(err)
@@ -182,16 +209,24 @@ func mockTest(t *testing.T, name string) {
 
 	actualCamundaRequests := camunda.PopRequestLog()
 	actualDeplRequests := depl.PopRequestLog()
+	actualFogDeplRequests := fog.PopRequestLog()
 	actualSmartServiceRepoRequests := repo.PopRequestLog()
 
 	if !reflect.DeepEqual(expectedCamundaRequests, actualCamundaRequests) {
-		temp, _ := json.Marshal(actualCamundaRequests)
-		t.Error(string(temp))
+		e, _ := json.Marshal(expectedCamundaRequests)
+		a, _ := json.Marshal(actualCamundaRequests)
+		t.Error("\n", string(e), "\n", string(a))
 	}
 
 	if !reflect.DeepEqual(expectedDeploymentRequests, actualDeplRequests) {
 		e, _ := json.Marshal(expectedDeploymentRequests)
 		a, _ := json.Marshal(actualDeplRequests)
+		t.Error("\n", string(e), "\n", string(a))
+	}
+
+	if !reflect.DeepEqual(expectedFogDeploymentRequests, actualFogDeplRequests) {
+		e, _ := json.Marshal(expectedFogDeploymentRequests)
+		a, _ := json.Marshal(actualFogDeplRequests)
 		t.Error("\n", string(e), "\n", string(a))
 	}
 

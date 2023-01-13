@@ -1,0 +1,12 @@
+[
+    {
+        "method":"GET",
+        "endpoint":"/networks",
+        "message":"[{\"id\":\"wrong1\", \"device_ids\":[\"device_unrelated_1\"]},{\"id\":\"nid\", \"device_ids\":[\"device_1\",\"device_unrelated_2\"]},{\"id\":\"wrong2\", \"device_ids\":[\"device_unrelated_3\"]}]"
+    },
+    {
+        "method":"GET",
+        "endpoint":"/device-groups/group_1",
+        "message": "{\"id\":\"group_1\", \"device_ids\":[\"device_1\"]}"
+    }
+]

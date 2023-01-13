@@ -82,6 +82,7 @@ func (this *SmartServiceRepoMock) getRouter() http.Handler {
 	router.PUT("/instances-by-process-id/:id/modules/:moduleId", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
 		temp, _ := io.ReadAll(request.Body)
 		msg := strings.ReplaceAll(string(temp), this.config.ProcessDeploymentUrl, "http://localhost")
+		msg = strings.ReplaceAll(msg, this.config.FogProcessDeploymentUrl, "http://localhost")
 		this.logRequest(Request{
 			Method:   request.Method,
 			Endpoint: request.URL.Path,

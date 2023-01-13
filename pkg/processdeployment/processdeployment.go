@@ -291,7 +291,7 @@ func (this *ProcessDeployment) GetGroup(token auth.Token, id string) (result Dev
 	}
 	req, err := http.NewRequest(
 		"GET",
-		this.config.DeviceRepositoryUrl+"/device-groups",
+		this.config.DeviceRepositoryUrl+"/device-groups/"+url.PathEscape(id),
 		nil,
 	)
 	if err != nil {

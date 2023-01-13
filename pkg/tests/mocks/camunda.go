@@ -46,6 +46,8 @@ type Request struct {
 	Message  string `json:"message"`
 }
 
+type Response = Request
+
 func (this *CamundaMock) Fetch() (result []model.CamundaExternalTask) {
 	select {
 	case result = <-this.Queue:
