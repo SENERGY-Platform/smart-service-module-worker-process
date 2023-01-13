@@ -1,3 +1,4 @@
 smart-service-module-worker-process
 .idea/
 *.iml
+coverage.out
