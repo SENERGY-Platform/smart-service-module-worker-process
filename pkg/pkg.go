@@ -29,7 +29,7 @@ import (
 
 func Start(ctx context.Context, wg *sync.WaitGroup, config processdeployment.Config, libConfig configuration.Config) error {
 	handlerFactory := func(auth *auth.Auth, smartServiceRepo *smartservicerepository.SmartServiceRepository) (camunda.Handler, error) {
-		return processdeployment.New(config, libConfig, auth, smartServiceRepo), nil
+		return processdeployment.New(ctx, wg, config, libConfig, auth, smartServiceRepo)
 	}
 	return lib.Start(ctx, wg, libConfig, handlerFactory)
 }

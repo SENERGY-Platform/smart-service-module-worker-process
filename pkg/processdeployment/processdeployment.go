@@ -17,6 +17,7 @@
 package processdeployment
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -29,11 +30,16 @@ import (
 	"net/http"
 	"net/url"
 	"runtime/debug"
+	"sync"
 	"time"
 )
 
-func New(config Config, libConfig configuration.Config, auth *auth.Auth, smartServiceRepo SmartServiceRepo) *ProcessDeployment {
-	return &ProcessDeployment{config: config, libConfig: libConfig, auth: auth, smartServiceRepo: smartServiceRepo}
+func New(ctx context.Context, wg *sync.WaitGroup, config Config, libConfig configuration.Config, auth *auth.Auth, smartServiceRepo SmartServiceRepo) (*ProcessDeployment, error) {
+	err := StartDoneEventHandling(ctx, wg, config, libConfig)
+	if err != nil {
+		return nil, err
+	}
+	return &ProcessDeployment{config: config, libConfig: libConfig, auth: auth, smartServiceRepo: smartServiceRepo}, nil
 }
 
 type ProcessDeployment struct {
@@ -100,7 +106,10 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 		deleteEndpoint = this.config.FogProcessDeploymentUrl + "/deployments/" + url.PathEscape(hubId) + "/" + url.PathEscape(resultDeployment.Id)
 	}
 
-	outputs = map[string]interface{}{"process_deployment_id": resultDeployment.Id}
+	outputs = map[string]interface{}{
+		"process_deployment_id": resultDeployment.Id,
+		"done_event":            deploymentIdToEventId(resultDeployment.Id),
+	}
 	if isFogDeployment {
 		outputs["is_fog_deployment"] = true
 		outputs["fog_hub"] = hubId

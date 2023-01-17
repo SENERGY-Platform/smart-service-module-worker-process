@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/SENERGY-Platform/process-deployment v0.0.0-20220905084332-12878d4ea714
-	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20230109103356-5ba73dac9d65
+	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20230117075848-30838c981941
 	github.com/julienschmidt/httprouter v1.3.0
 )
 

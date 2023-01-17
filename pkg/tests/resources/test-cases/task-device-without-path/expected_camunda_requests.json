@@ -2,6 +2,6 @@
     {
         "method":"POST",
         "endpoint":"/engine-rest/external-task/task1/complete",
-        "message":"{\"workerId\":\"process_deployment\",\"localVariables\":{\"process_deployment_id\":{\"value\":\"new-deployment-id\"}}}\n"
+        "message":"{\"workerId\":\"process_deployment\",\"localVariables\":{\"done_event\":{\"value\":\"deployment_done_new-deployment-id\"},\"process_deployment_id\":{\"value\":\"new-deployment-id\"}}}\n"
     }
 ]

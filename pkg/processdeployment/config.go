@@ -25,4 +25,7 @@ type Config struct {
 	AllowImportsInFogProcesses bool   `json:"allow_imports_in_fog_processes"`
 	ProcessDeploymentSource    string `json:"process_deployment_source"`
 	WorkerParamPrefix          string `json:"worker_param_prefix"`
+	KafkaUrl                   string `json:"kafka_url"`
+	KafkaConsumerGroup         string `json:"kafka_consumer_group"`
+	ProcessDeploymentDoneTopic string `json:"process_deployment_done_topic"`
 }
