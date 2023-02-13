@@ -59,6 +59,7 @@ func prepareMocks(ctx context.Context, wg *sync.WaitGroup, responses []mocks.Res
 	if err != nil {
 		return
 	}
+	conf.AllowMsgEventsInFogProcesses = true
 	libConf.CamundaWorkerWaitDurationInMs = 200
 
 	deployment = mocks.NewDeploymentMock()

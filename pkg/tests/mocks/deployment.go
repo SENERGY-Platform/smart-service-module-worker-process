@@ -112,7 +112,7 @@ func (this *DeploymentMock) getRouter() http.Handler {
 			return
 		}
 		optionals := map[string]bool{}
-		optionalServiceStr := params.ByName("optional_service_selection")
+		optionalServiceStr := request.URL.Query().Get("optional_service_selection")
 		if optionalServiceStr != "" {
 			optionals["service"], err = strconv.ParseBool(optionalServiceStr)
 			if err != nil {

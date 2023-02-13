@@ -208,8 +208,19 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 				imports = append(imports, *element.MessageEvent.Selection.SelectedImportId)
 			}
 		}
+		if element.ConditionalEvent != nil {
+			if element.ConditionalEvent.Selection.SelectedDeviceId != nil {
+				devices = append(devices, *element.ConditionalEvent.Selection.SelectedDeviceId)
+			}
+			if element.ConditionalEvent.Selection.SelectedDeviceGroupId != nil {
+				groups = append(groups, *element.ConditionalEvent.Selection.SelectedDeviceGroupId)
+			}
+			if element.ConditionalEvent.Selection.SelectedImportId != nil {
+				imports = append(imports, *element.ConditionalEvent.Selection.SelectedImportId)
+			}
+		}
 	}
-	if !this.config.AllowEventsInFogProcesses && usesEvents {
+	if !this.config.AllowMsgEventsInFogProcesses && usesEvents {
 		return false, "", nil
 	}
 	if !this.config.AllowImportsInFogProcesses && len(imports) > 0 {

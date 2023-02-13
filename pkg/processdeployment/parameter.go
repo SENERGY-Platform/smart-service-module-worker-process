@@ -95,6 +95,8 @@ func (this *ProcessDeployment) setSelection(task model.CamundaExternalTask, elem
 		elementSelection = &element.Task.Selection
 	case element.MessageEvent != nil:
 		elementSelection = &element.MessageEvent.Selection
+	case element.ConditionalEvent != nil:
+		elementSelection = &element.ConditionalEvent.Selection
 	default:
 		return nil
 	}

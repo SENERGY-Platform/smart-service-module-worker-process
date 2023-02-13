@@ -34,9 +34,9 @@
 - Variable-Name-Example: `process_deployment.name`
 - Value: string
 
-### Task-IoT-Selection
+### IoT-Selection
 
-- Desc: sets the iot selection of a task
+- Desc: sets the iot selection of a process element
 - Variable-Name-Template: `{{config.WorkerParamPrefix}}.{{element.BpmnId}}.selection`
 - Variable-Name-Example: `process_deployment.Task_1uopw0b.selection`
 - Value: json.Marshal(model.IotOption{})

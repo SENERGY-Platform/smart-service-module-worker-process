@@ -70,6 +70,9 @@ func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmod
 		if element.MessageEvent != nil && len(element.MessageEvent.Selection.SelectionOptions) > 0 {
 			element.MessageEvent.Selection.SelectionOptions = []deploymentmodel.SelectionOption{}
 		}
+		if element.ConditionalEvent != nil && len(element.ConditionalEvent.Selection.SelectionOptions) > 0 {
+			element.ConditionalEvent.Selection.SelectionOptions = []deploymentmodel.SelectionOption{}
+		}
 		deployment.Elements[i] = element
 	}
 	body := new(bytes.Buffer)

@@ -1,11 +1,12 @@
 module github.com/SENERGY-Platform/smart-service-module-worker-process
 
-go 1.18
+go 1.19
 
 require (
-	github.com/SENERGY-Platform/process-deployment v0.0.0-20220905084332-12878d4ea714
+	github.com/SENERGY-Platform/process-deployment v0.0.0-20230213101136-179a92a454e2
 	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20230117075848-30838c981941
 	github.com/julienschmidt/httprouter v1.3.0
+	github.com/segmentio/kafka-go v0.4.15
 )
 
 require (
@@ -13,11 +14,13 @@ require (
 	github.com/Microsoft/go-winio v0.5.1 // indirect
 	github.com/Nvveen/Gotty v0.0.0-20120604004816-cd527374f1e5 // indirect
 	github.com/SENERGY-Platform/device-repository v0.0.0-20230109071552-1ba9032e599d // indirect
-	github.com/SENERGY-Platform/models/go v0.0.0-20221223081229-be7eb5ebb37f // indirect
+	github.com/SENERGY-Platform/models/go v0.0.0-20230105115534-8edcf0271764 // indirect
 	github.com/acobaugh/osrelease v0.0.0-20181218015638-a93a0a55a249 // indirect
 	github.com/beevik/etree v1.1.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.2 // indirect
+	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/containerd/continuity v0.0.0-20190827140505-75bee3e2ccb6 // indirect
+	github.com/coocood/freecache v1.1.0 // indirect
 	github.com/dlclark/regexp2 v1.7.0 // indirect
 	github.com/docker/cli v20.10.11+incompatible // indirect
 	github.com/docker/docker v20.10.7+incompatible // indirect
@@ -30,7 +33,6 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510 // indirect
-	github.com/google/uuid v1.1.1 // indirect
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
@@ -44,7 +46,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/samuel/go-zookeeper v0.0.0-20190810000440-0ceca61e4d75 // indirect
 	github.com/satori/go.uuid v1.2.0 // indirect
-	github.com/segmentio/kafka-go v0.4.15 // indirect
 	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/tryvium-travels/memongo v0.7.0 // indirect
