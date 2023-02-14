@@ -37,7 +37,7 @@ func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Conf
 				debug.PrintStack()
 				return nil //ignore  message
 			}
-			if msg.Command == "PUT" {
+			if msg.Command == "PUT" && msg.Handler != "github.com/SENERGY-Platform/event-deployment" {
 				err = camunda.SendEventTrigger(libConfig, deploymentIdToEventId(msg.Id), nil)
 				if err != nil {
 					log.Println("ERROR: unable to send event trigger:", err)
