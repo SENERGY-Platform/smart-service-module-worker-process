@@ -25,6 +25,7 @@ import (
 	"log"
 	"runtime/debug"
 	"sync"
+	"time"
 )
 
 func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Config, libConfig configuration.Config) error {
@@ -38,15 +39,23 @@ func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Conf
 				return nil //ignore  message
 			}
 			if msg.Command == "PUT" && msg.Handler != "github.com/SENERGY-Platform/event-deployment" {
-				err = camunda.SendEventTrigger(libConfig, deploymentIdToEventId(msg.Id), nil)
+				eventId := deploymentIdToEventId(msg.Id)
+				err = camunda.SendEventTrigger(libConfig, eventId, nil)
 				if err != nil {
 					log.Println("ERROR: unable to send event trigger:", err)
 					debug.PrintStack()
+					return err
 				}
-				return err
-			} else {
-				return nil
+				go func() {
+					time.Sleep(5 * time.Second)
+					err = camunda.SendEventTrigger(libConfig, eventId, nil)
+					if err != nil {
+						log.Println("ERROR: unable to send event trigger:", err)
+						debug.PrintStack()
+					}
+				}()
 			}
+			return nil
 		})
 	}
 	return nil
