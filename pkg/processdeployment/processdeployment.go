@@ -149,6 +149,14 @@ func (this *ProcessDeployment) UseVariables(task model.CamundaExternalTask, depl
 	if name != "" {
 		deployment.Name = name
 	}
+	err := this.setStartParameter(task, deployment)
+	if err != nil {
+		return err
+	}
+	err = this.setIncidentHandling(task, deployment)
+	if err != nil {
+		return err
+	}
 	handler := []func(task model.CamundaExternalTask, element *deploymentmodel.Element) error{
 		this.setSelection,
 		this.setParameter,

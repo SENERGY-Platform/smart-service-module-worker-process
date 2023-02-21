@@ -16,6 +16,8 @@ github.com/SENERGY-Platform/process-deployment v0.0.0-20230213081930-617f37e1721
 github.com/SENERGY-Platform/process-deployment v0.0.0-20230213081930-617f37e17210/go.mod h1:vqh9BCV6is5UVKIFRAjiKQrHet5WSgbdITV0YI+vFQ4=
 github.com/SENERGY-Platform/process-deployment v0.0.0-20230213101136-179a92a454e2 h1:V8Hyg1wtddqGi+I1+DlSb3nE5y51H6hTioh74yWQSTk=
 github.com/SENERGY-Platform/process-deployment v0.0.0-20230213101136-179a92a454e2/go.mod h1:vqh9BCV6is5UVKIFRAjiKQrHet5WSgbdITV0YI+vFQ4=
+github.com/SENERGY-Platform/process-deployment v0.0.0-20230220144253-c09c2b3cfff5 h1:+LDQ4dY7V/XMjo7fop/28h0ZJgIkYmQLRYD6hXWQr8c=
+github.com/SENERGY-Platform/process-deployment v0.0.0-20230220144253-c09c2b3cfff5/go.mod h1:vqh9BCV6is5UVKIFRAjiKQrHet5WSgbdITV0YI+vFQ4=
 github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20230117075848-30838c981941 h1:hh7eN4TUk9OS7QrsUzJbkSQcpBQybuQhlOQ9Uca0p8c=
 github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20230117075848-30838c981941/go.mod h1:7l4ktzpBYH+HqMr8+8gyDbv30+USuTs7FpmRb+lAG4c=
 github.com/acobaugh/osrelease v0.0.0-20181218015638-a93a0a55a249 h1:fMi9ZZ/it4orHj3xWrM6cLkVFcCbkXQALFUiNtHtCPs=

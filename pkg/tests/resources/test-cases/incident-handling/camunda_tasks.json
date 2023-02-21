@@ -1,0 +1,27 @@
+[
+    {
+        "id": "task1",
+        "processInstanceId": "process-instance-1",
+        "processDefinitionId": "process-definition-1",
+        "variables": {
+            "foo": {
+                "value": "bar"
+            },
+            "process_deployment.module_data": {
+                "value": "{\"additional-info\": 42}"
+            },
+            "process_deployment.process_model_id": {
+                "value": "test-model-id"
+            },
+            "process_deployment.name": {
+                "value": "test-deployment-name-updated"
+            },
+            "process_deployment.on_incident.restart": {
+                "value": "true"
+            },
+            "process_deployment.on_incident.notify": {
+                "value": "false"
+            }
+        }
+    }
+]

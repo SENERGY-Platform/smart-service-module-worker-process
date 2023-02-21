@@ -24,6 +24,7 @@ import (
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deviceselectionmodel"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 	"strconv"
+	"strings"
 )
 
 func (this *ProcessDeployment) getModuleData(task model.CamundaExternalTask) (result map[string]interface{}) {
@@ -53,6 +54,100 @@ func (this *ProcessDeployment) getProcessModelId(task model.CamundaExternalTask)
 		return ""
 	}
 	return result
+}
+
+func (this *ProcessDeployment) setStartParameter(task model.CamundaExternalTask, deployment *deploymentmodel.Deployment) error {
+	for key, variable := range task.Variables {
+		prefix := this.config.WorkerParamPrefix + "start_parameter.default."
+		if strings.HasPrefix(key, prefix) {
+			paramName := strings.TrimPrefix(key, prefix)
+			for i, param := range deployment.StartParameter {
+				if param.Id == paramName {
+					temp, ok := variable.Value.(string)
+					if !ok {
+						b, err := json.Marshal(variable.Value)
+						if err != nil {
+							return err
+						}
+						temp = string(b)
+					}
+					param.Default = temp
+				}
+				deployment.StartParameter[i] = param
+			}
+		}
+	}
+	return nil
+}
+
+func (this *ProcessDeployment) setIncidentHandling(task model.CamundaExternalTask, deployment *deploymentmodel.Deployment) error {
+	err := this.setIncidentHandlingRestart(task, deployment)
+	if err != nil {
+		return err
+	}
+	err = this.setIncidentHandlingNotify(task, deployment)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (this *ProcessDeployment) setIncidentHandlingRestart(task model.CamundaExternalTask, deployment *deploymentmodel.Deployment) error {
+	variable, ok := task.Variables[this.config.WorkerParamPrefix+"on_incident.restart"]
+	if !ok {
+		return nil
+	}
+	if deployment.IncidentHandling == nil {
+		deployment.IncidentHandling = &deploymentmodel.IncidentHandling{
+			Restart: false,
+			Notify:  true,
+		}
+	}
+	switch v := variable.Value.(type) {
+	case string:
+		result, err := strconv.ParseBool(v)
+		if err != nil {
+			err = fmt.Errorf("unexpected value in %v: %v (%w)", this.config.WorkerParamPrefix+"prefer_fog_deployment", v, err)
+			return err
+		}
+		deployment.IncidentHandling.Restart = result
+		return nil
+	case bool:
+		deployment.IncidentHandling.Restart = v
+		return nil
+	default:
+		err := fmt.Errorf("unexpected value in %v: %v", this.config.WorkerParamPrefix+"prefer_fog_deployment", v)
+		return err
+	}
+}
+
+func (this *ProcessDeployment) setIncidentHandlingNotify(task model.CamundaExternalTask, deployment *deploymentmodel.Deployment) error {
+	variable, ok := task.Variables[this.config.WorkerParamPrefix+"on_incident.notify"]
+	if !ok {
+		return nil
+	}
+	if deployment.IncidentHandling == nil {
+		deployment.IncidentHandling = &deploymentmodel.IncidentHandling{
+			Restart: false,
+			Notify:  true,
+		}
+	}
+	switch v := variable.Value.(type) {
+	case string:
+		result, err := strconv.ParseBool(v)
+		if err != nil {
+			err = fmt.Errorf("unexpected value in %v: %v (%w)", this.config.WorkerParamPrefix+"prefer_fog_deployment", v, err)
+			return err
+		}
+		deployment.IncidentHandling.Notify = result
+		return nil
+	case bool:
+		deployment.IncidentHandling.Notify = v
+		return nil
+	default:
+		err := fmt.Errorf("unexpected value in %v: %v", this.config.WorkerParamPrefix+"prefer_fog_deployment", v)
+		return err
+	}
 }
 
 func (this *ProcessDeployment) getProcessName(task model.CamundaExternalTask) string {

@@ -3,7 +3,7 @@ module github.com/SENERGY-Platform/smart-service-module-worker-process
 go 1.19
 
 require (
-	github.com/SENERGY-Platform/process-deployment v0.0.0-20230213101136-179a92a454e2
+	github.com/SENERGY-Platform/process-deployment v0.0.0-20230220144253-c09c2b3cfff5
 	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20230117075848-30838c981941
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/segmentio/kafka-go v0.4.15
