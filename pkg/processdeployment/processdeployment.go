@@ -25,6 +25,7 @@ import (
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
+	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/processdeployment/idmodifier"
 	"io"
 	"log"
 	"net/http"
@@ -244,6 +245,7 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 		}
 		devices = append(devices, group.DeviceIds...)
 	}
+
 	networks, err := this.GetFogNetworks(token)
 	if err != nil {
 		return false, "", err
@@ -259,7 +261,8 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 		}
 		missingDeviceInNetwork := false
 		for _, id := range devices {
-			if !networkIndex[id] {
+			pureId, _ := idmodifier.SplitModifier(id)
+			if !networkIndex[pureId] {
 				missingDeviceInNetwork = true
 				break
 			}

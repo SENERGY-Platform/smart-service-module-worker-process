@@ -1,0 +1,7 @@
+[
+    {
+        "method":"GET",
+        "endpoint":"/v3/prepared-deployments/test-model-id",
+        "message":""
+    }
+]

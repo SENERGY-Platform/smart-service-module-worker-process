@@ -1,0 +1,27 @@
+[
+    {
+        "id": "task1",
+        "processInstanceId": "process-instance-1",
+        "processDefinitionId": "process-definition-1",
+        "variables": {
+            "foo": {
+                "value": "bar"
+            },
+            "process_deployment.module_data": {
+                "value": "{\"additional-info\": 42}"
+            },
+            "process_deployment.process_model_id": {
+                "value": "test-model-id"
+            },
+            "process_deployment.name": {
+                "value": "test-deployment-name-updated"
+            },
+            "process_deployment.IntermediateThrowEvent_1fivwfn.selection": {
+                "value": "{\"device_selection\":{\"device_id\":\"urn:infai:ses:device:79fa231c-45d9-4266-b5fb-2c051bfd8c0d$service_group_selection=sg1\"}}"
+            },
+            "process_deployment.prefer_fog_deployment": {
+                "value": "true"
+            }
+        }
+    }
+]
