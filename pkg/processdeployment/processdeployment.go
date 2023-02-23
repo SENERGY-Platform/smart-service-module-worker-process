@@ -113,6 +113,9 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 	if isFogDeployment {
 		outputs["is_fog_deployment"] = true
 		outputs["fog_hub"] = hubId
+	} else {
+		outputs["is_fog_deployment"] = false
+		outputs["fog_hub"] = ""
 	}
 
 	return []model.Module{{
