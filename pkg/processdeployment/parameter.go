@@ -252,6 +252,31 @@ func (this *ProcessDeployment) setSelection(task model.CamundaExternalTask, elem
 	return nil
 }
 
+func (this *ProcessDeployment) setConditionalEventVariables(task model.CamundaExternalTask, element *deploymentmodel.Element) error {
+	if element.ConditionalEvent == nil {
+		return nil
+	}
+	for key, _ := range element.ConditionalEvent.Variables {
+		parameterName := this.config.WorkerParamPrefix + element.BpmnId + ".variables." + key
+		parameterVariable, ok := task.Variables[parameterName]
+		if !ok {
+			continue
+		}
+		parameterString, ok := parameterVariable.Value.(string)
+		if ok {
+			element.ConditionalEvent.Variables[key] = parameterString
+		} else {
+			jsonParameter, err := json.Marshal(parameterVariable.Value)
+			if err != nil {
+				return fmt.Errorf("unable to interpret %v parameter: %w", parameterName, err)
+			}
+			element.ConditionalEvent.Variables[key] = string(jsonParameter)
+		}
+	}
+
+	return nil
+}
+
 func (this *ProcessDeployment) setParameter(task model.CamundaExternalTask, element *deploymentmodel.Element) error {
 	if element.Task == nil {
 		return nil
