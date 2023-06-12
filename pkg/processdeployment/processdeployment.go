@@ -190,6 +190,7 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 		return false, "", err
 	}
 	if !preferFogDeployment {
+		log.Println("IsFogDeployment: preferFogDeployment == false")
 		return false, "", nil
 	}
 
@@ -234,9 +235,11 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 		}
 	}
 	if !this.config.AllowMsgEventsInFogProcesses && usesEvents {
+		log.Println("IsFogDeployment: usesEvents == true && AllowMsgEventsInFogProcesses == false")
 		return false, "", nil
 	}
 	if !this.config.AllowImportsInFogProcesses && len(imports) > 0 {
+		log.Println("IsFogDeployment: len(imports) > 0 && AllowImportsInFogProcesses == false")
 		return false, "", nil
 	}
 	for _, groupId := range groups {
@@ -272,6 +275,7 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 			return true, network.Id, nil
 		}
 	}
+	log.Println("IsFogDeployment: missingDeviceInNetwork", devices)
 	return false, "", nil
 }
 
