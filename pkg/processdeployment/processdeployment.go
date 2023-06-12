@@ -258,6 +258,7 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 		log.Println("WARNING: process deployments without devices wont be run in fog")
 		return false, "", nil
 	}
+	missingDevices := map[string]string{}
 	for _, network := range networks {
 		networkIndex := map[string]bool{}
 		for _, id := range network.DeviceIds {
@@ -268,6 +269,7 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 			pureId, _ := idmodifier.SplitModifier(id)
 			if !networkIndex[pureId] {
 				missingDeviceInNetwork = true
+				missingDevices[network.Name] = id
 				break
 			}
 		}
@@ -275,7 +277,7 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 			return true, network.Id, nil
 		}
 	}
-	log.Println("IsFogDeployment: missingDeviceInNetwork", devices)
+	log.Printf("IsFogDeployment: missingDeviceInNetwork %#v\n", missingDevices)
 	return false, "", nil
 }
 
