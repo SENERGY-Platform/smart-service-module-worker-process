@@ -267,9 +267,9 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 		missingDeviceInNetwork := false
 		for _, id := range devices {
 			pureId, _ := idmodifier.SplitModifier(id)
-			if !networkIndex[pureId] {
+			if !networkIndex[pureId] && !networkIndex[id] {
 				missingDeviceInNetwork = true
-				missingDevices[network.Name] = id
+				missingDevices[network.Name] = pureId
 				break
 			}
 		}
