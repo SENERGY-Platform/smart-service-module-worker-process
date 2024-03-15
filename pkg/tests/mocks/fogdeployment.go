@@ -19,8 +19,8 @@ package mocks
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/process-deployment/lib/api/util"
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
+	"github.com/SENERGY-Platform/service-commons/pkg/accesslog"
 	"github.com/julienschmidt/httprouter"
 	"io"
 	"log"
@@ -101,5 +101,5 @@ func (this *FogDeploymentMock) getRouter() http.Handler {
 		json.NewEncoder(writer).Encode(deployment)
 	})
 
-	return util.NewLogger(router)
+	return accesslog.New(router)
 }

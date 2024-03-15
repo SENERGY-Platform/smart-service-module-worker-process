@@ -19,7 +19,7 @@ package mocks
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/process-deployment/lib/api/util"
+	"github.com/SENERGY-Platform/service-commons/pkg/accesslog"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
 	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/processdeployment"
 	"github.com/julienschmidt/httprouter"
@@ -121,5 +121,5 @@ func (this *SmartServiceRepoMock) getRouter() http.Handler {
 		writer.WriteHeader(200)
 	})
 
-	return util.NewLogger(router)
+	return accesslog.New(router)
 }
