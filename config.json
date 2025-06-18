@@ -24,5 +24,6 @@
 
     "kafka_url": "",
     "kafka_consumer_group": "smart-service-module-worker-process",
-    "process_deployment_done_topic": "process-deployment-done"
+    "process_deployment_done_topic": "process-deployment-done",
+    "init_topics": false
 }

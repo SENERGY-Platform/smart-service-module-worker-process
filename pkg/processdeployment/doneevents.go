@@ -30,6 +30,13 @@ import (
 
 func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Config, libConfig configuration.Config) error {
 	if config.KafkaUrl != "" && config.KafkaUrl != "-" {
+		if config.InitTopics {
+			err := kafka.InitTopic(config.KafkaUrl, config.ProcessDeploymentDoneTopic)
+			if err != nil {
+				log.Println("ERROR: unable to create topic", err)
+				return err
+			}
+		}
 		return kafka.NewConsumer(ctx, wg, config.KafkaUrl, config.KafkaConsumerGroup, config.ProcessDeploymentDoneTopic, func(delivery []byte) error {
 			msg := DoneNotification{}
 			err := json.Unmarshal(delivery, &msg)

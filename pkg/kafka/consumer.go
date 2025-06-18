@@ -32,12 +32,6 @@ func NewConsumer(ctx context.Context, wg *sync.WaitGroup, kafkaUrl string, consu
 		log.Println("ERROR: unable to get broker list", err)
 		return err
 	}
-
-	err = InitTopic(kafkaUrl, topic)
-	if err != nil {
-		log.Println("ERROR: unable to create topic", err)
-		return err
-	}
 	r := kafka.NewReader(kafka.ReaderConfig{
 		CommitInterval: 0, //synchronous commits
 		Brokers:        broker,
