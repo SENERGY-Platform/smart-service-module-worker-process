@@ -43,9 +43,9 @@ func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Conf
 			if err != nil {
 				log.Println("ERROR: unable to interpret kafka msg:", err)
 				debug.PrintStack()
-				return nil //ignore  message
+				return nil //ignore message
 			}
-			if msg.Command == "PUT" && msg.Handler != "github.com/SENERGY-Platform/event-deployment" {
+			if msg.Command == "PUT" {
 				eventId := deploymentIdToEventId(msg.Id)
 				err = camunda.SendEventTrigger(libConfig, eventId, nil)
 				if err != nil {
