@@ -21,18 +21,18 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
-	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
-	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
-	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/processdeployment/idmodifier"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"runtime/debug"
 	"sync"
 	"time"
+
+	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
+	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/processdeployment/idmodifier"
 )
 
 func New(ctx context.Context, wg *sync.WaitGroup, config Config, libConfig configuration.Config, auth *auth.Auth, smartServiceRepo SmartServiceRepo) (*ProcessDeployment, error) {
@@ -62,35 +62,35 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 	}
 	userId, err := this.smartServiceRepo.GetInstanceUser(task.ProcessInstanceId)
 	if err != nil {
-		log.Println("ERROR: unable to get instance user", err)
+		this.libConfig.GetLogger().Error("unable to get instance user", "error", err)
 		return modules, outputs, err
 	}
 	token, err := this.auth.ExchangeUserToken(userId)
 	if err != nil {
-		log.Println("ERROR: unable to exchange user token", err)
+		this.libConfig.GetLogger().Error("unable to exchange user token", "error", err)
 		return modules, outputs, err
 	}
 	deployment, err := this.PrepareRequest(token, modelId)
 	if err != nil {
-		log.Println("ERROR: unable to prepare process deployment", err)
+		this.libConfig.GetLogger().Error("unable to prepare process deployment", "error", err)
 		return modules, outputs, err
 	}
 
 	err = this.UseVariables(task, &deployment)
 	if err != nil {
-		log.Println("ERROR: unable to use variables", err)
+		this.libConfig.GetLogger().Error("unable to use variables", "error", err)
 		return modules, outputs, err
 	}
 
 	isFogDeployment, hubId, err := this.IsFogDeployment(token, task, deployment)
 	if err != nil {
-		log.Println("ERROR: unable to use variables", err)
+		this.libConfig.GetLogger().Error("unable to use variables", "error", err)
 		return modules, outputs, err
 	}
 
 	resultDeployment, err := this.Deploy(token, deployment, true, hubId)
 	if err != nil {
-		log.Println("ERROR: unable to deploy process", err)
+		this.libConfig.GetLogger().Error("unable to deploy process", "error", err)
 		return modules, outputs, err
 	}
 
@@ -136,13 +136,12 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 }
 
 func (this *ProcessDeployment) Undo(modules []model.Module, reason error) {
-	log.Println("UNDO:", reason)
+	this.libConfig.GetLogger().Debug("undo", "reason", reason)
 	for _, module := range modules {
 		if module.DeleteInfo != nil {
 			err := this.smartServiceRepo.UseModuleDeleteInfo(*module.DeleteInfo)
 			if err != nil {
-				log.Println("ERROR:", err)
-				debug.PrintStack()
+				this.libConfig.GetLogger().Error("error in ProcessDeployment.Undo", "error", err, "stack", string(debug.Stack()))
 			}
 		}
 	}
@@ -190,7 +189,7 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 		return false, "", err
 	}
 	if !preferFogDeployment {
-		log.Println("IsFogDeployment: preferFogDeployment == false")
+		this.libConfig.GetLogger().Debug("IsFogDeployment: preferFogDeployment == false")
 		return false, "", nil
 	}
 
@@ -235,11 +234,11 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 		}
 	}
 	if !this.config.AllowMsgEventsInFogProcesses && usesEvents {
-		log.Println("IsFogDeployment: usesEvents == true && AllowMsgEventsInFogProcesses == false")
+		this.libConfig.GetLogger().Debug("IsFogDeployment: usesEvents == true && AllowMsgEventsInFogProcesses == false")
 		return false, "", nil
 	}
 	if !this.config.AllowImportsInFogProcesses && len(imports) > 0 {
-		log.Println("IsFogDeployment: len(imports) > 0 && AllowImportsInFogProcesses == false")
+		this.libConfig.GetLogger().Debug("IsFogDeployment: len(imports) > 0 && AllowImportsInFogProcesses == false")
 		return false, "", nil
 	}
 	for _, groupId := range groups {
@@ -255,7 +254,7 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 		return false, "", err
 	}
 	if len(devices) == 0 {
-		log.Println("WARNING: process deployments without devices wont be run in fog")
+		this.libConfig.GetLogger().Warn("process deployments without devices wont be run in fog")
 		return false, "", nil
 	}
 	missingDevices := map[string]string{}
@@ -277,7 +276,7 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 			return true, network.Id, nil
 		}
 	}
-	log.Printf("IsFogDeployment: missingDeviceInNetwork %#v\n", missingDevices)
+	this.libConfig.GetLogger().Debug("IsFogDeployment: missingDeviceInNetwork", "missingDevices", fmt.Sprintf("%#v", missingDevices))
 	return false, "", nil
 }
 

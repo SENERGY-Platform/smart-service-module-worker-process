@@ -19,15 +19,16 @@ package mocks
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
-	"github.com/SENERGY-Platform/service-commons/pkg/accesslog"
-	"github.com/julienschmidt/httprouter"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
 	"sync"
+
+	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
+	"github.com/SENERGY-Platform/service-commons/pkg/accesslog"
+	"github.com/julienschmidt/httprouter"
 )
 
 func NewFogDeploymentMock() *FogDeploymentMock {
@@ -92,7 +93,7 @@ func (this *FogDeploymentMock) getRouter() http.Handler {
 			}
 		}
 		deployment.Id = "new-deployment-id"
-		err = deployment.Validate(deploymentmodel.ValidateRequest, optionals)
+		err = deployment.Validate(deploymentmodel.ValidateRequest, optionals, deploymentmodel.DeploymentXmlValidator)
 		if err != nil {
 			log.Println("ERROR: bad request", err)
 			http.Error(writer, err.Error(), http.StatusBadRequest)

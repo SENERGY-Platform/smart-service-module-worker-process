@@ -19,17 +19,19 @@ package kafka
 import (
 	"context"
 	"errors"
-	"github.com/segmentio/kafka-go"
 	"io"
 	"log"
+	"log/slog"
 	"sync"
 	"time"
+
+	"github.com/segmentio/kafka-go"
 )
 
-func NewConsumer(ctx context.Context, wg *sync.WaitGroup, kafkaUrl string, consumerGroup string, topic string, listener func(delivery []byte) error) error {
+func NewConsumer(ctx context.Context, wg *sync.WaitGroup, logger *slog.Logger, kafkaUrl string, consumerGroup string, topic string, listener func(delivery []byte) error) error {
 	broker, err := GetBroker(kafkaUrl)
 	if err != nil {
-		log.Println("ERROR: unable to get broker list", err)
+		logger.Error("unable to get broker list", "error", err)
 		return err
 	}
 	r := kafka.NewReader(kafka.ReaderConfig{
@@ -45,17 +47,18 @@ func NewConsumer(ctx context.Context, wg *sync.WaitGroup, kafkaUrl string, consu
 	go func() {
 		defer wg.Done()
 		defer r.Close()
-		defer log.Println("close consumer for topic ", topic)
+		defer logger.Info("close consumer for topic " + topic)
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			default:
 				m, err := r.FetchMessage(ctx)
-				if err == io.EOF || err == context.Canceled {
+				if errors.Is(err, io.EOF) || errors.Is(err, context.Canceled) {
 					return
 				}
 				if err != nil {
+					logger.Error("error while consuming topic", "error", err)
 					log.Fatal("ERROR: while consuming topic ", topic, err)
 					return
 				}
@@ -67,10 +70,12 @@ func NewConsumer(ctx context.Context, wg *sync.WaitGroup, kafkaUrl string, consu
 				}, 10*time.Minute)
 
 				if err != nil {
+					logger.Error("unable to handle message (no commit)", "error", err)
 					log.Fatal("ERROR: unable to handle message (no commit)", err)
 				} else {
 					err = r.CommitMessages(ctx, m)
 					if err != nil {
+						logger.Error("error while committing consumption of topic "+topic, "error", err)
 						log.Fatal("ERROR: while committing consumption ", topic, err)
 						return
 					}
@@ -87,10 +92,8 @@ func retry(f func() error, waitProvider func(n int64) time.Duration, timeout tim
 	for i := int64(1); err != nil && time.Since(start) < timeout; i++ {
 		err = f()
 		if err != nil {
-			log.Println("ERROR: kafka listener error:", err)
 			wait := waitProvider(i)
 			if time.Since(start)+wait < timeout {
-				log.Println("ERROR: retry after:", wait.String())
 				time.Sleep(wait)
 			} else {
 				return err

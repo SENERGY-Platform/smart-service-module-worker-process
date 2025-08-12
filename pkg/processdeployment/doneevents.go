@@ -19,13 +19,13 @@ package processdeployment
 import (
 	"context"
 	"encoding/json"
-	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/camunda"
-	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/kafka"
-	"log"
 	"runtime/debug"
 	"sync"
 	"time"
+
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/camunda"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
+	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/kafka"
 )
 
 func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Config, libConfig configuration.Config) error {
@@ -33,32 +33,29 @@ func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Conf
 		if config.InitTopics {
 			err := kafka.InitTopic(config.KafkaUrl, config.ProcessDeploymentDoneTopic)
 			if err != nil {
-				log.Println("ERROR: unable to create topic", err)
+				libConfig.GetLogger().Error("unable to create topic", "error", err)
 				return err
 			}
 		}
-		return kafka.NewConsumer(ctx, wg, config.KafkaUrl, config.KafkaConsumerGroup, config.ProcessDeploymentDoneTopic, func(delivery []byte) error {
+		return kafka.NewConsumer(ctx, wg, libConfig.GetLogger(), config.KafkaUrl, config.KafkaConsumerGroup, config.ProcessDeploymentDoneTopic, func(delivery []byte) error {
 			msg := DoneNotification{}
 			err := json.Unmarshal(delivery, &msg)
 			if err != nil {
-				log.Println("ERROR: unable to interpret kafka msg:", err)
-				debug.PrintStack()
+				libConfig.GetLogger().Error("unable to interpret kafka msg", "error", err, "stack", string(debug.Stack()))
 				return nil //ignore message
 			}
 			if msg.Command == "PUT" {
 				eventId := deploymentIdToEventId(msg.Id)
 				err = camunda.SendEventTrigger(libConfig, eventId, nil)
 				if err != nil {
-					log.Println("ERROR: unable to send event trigger:", err)
-					debug.PrintStack()
+					libConfig.GetLogger().Error("unable to send event trigger", "error", err, "stack", string(debug.Stack()))
 					return err
 				}
 				go func() {
 					time.Sleep(5 * time.Second)
 					err = camunda.SendEventTrigger(libConfig, eventId, nil)
 					if err != nil {
-						log.Println("ERROR: unable to send event trigger:", err)
-						debug.PrintStack()
+						libConfig.GetLogger().Error("unable to send event trigger", "error", err, "stack", string(debug.Stack()))
 					}
 				}()
 			}

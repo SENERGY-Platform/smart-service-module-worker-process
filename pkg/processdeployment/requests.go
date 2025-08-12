@@ -20,13 +20,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
-	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"runtime/debug"
+
+	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 )
 
 func (this *ProcessDeployment) PrepareRequest(token auth.Token, processId string) (deployment deploymentmodel.Deployment, err error) {
@@ -78,8 +78,7 @@ func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmod
 	body := new(bytes.Buffer)
 	err = json.NewEncoder(body).Encode(deployment)
 	if err != nil {
-		log.Println("ERROR:", err)
-		debug.PrintStack()
+		this.libConfig.GetLogger().Error("error in ProcessDeployment.Deploy", "error", err, "stack", string(debug.Stack()))
 		return result, err
 	}
 	endpoint := this.config.ProcessDeploymentUrl + "/v3/deployments" + queryStr
