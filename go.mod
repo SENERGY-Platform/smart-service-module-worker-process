@@ -7,7 +7,7 @@ toolchain go1.24.6
 require (
 	github.com/SENERGY-Platform/process-deployment v0.0.20
 	github.com/SENERGY-Platform/service-commons v0.0.0-20250707072258-a5b49118c926
-	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20250812092418-dd1d78d97121
+	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20250826124800-822d514cda3d
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/segmentio/kafka-go v0.4.47
 )
