@@ -39,6 +39,7 @@ func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Conf
 		}
 		return kafka.NewConsumer(ctx, wg, libConfig.GetLogger(), config.KafkaUrl, config.KafkaConsumerGroup, config.ProcessDeploymentDoneTopic, func(delivery []byte) error {
 			msg := DoneNotification{}
+			libConfig.GetLogger().Debug("received done notification", "id", msg.Id, "source", msg.Handler, "command", msg.Command)
 			err := json.Unmarshal(delivery, &msg)
 			if err != nil {
 				libConfig.GetLogger().Error("unable to interpret kafka msg", "error", err, "stack", string(debug.Stack()))
