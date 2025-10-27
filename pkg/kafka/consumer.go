@@ -28,7 +28,7 @@ import (
 	"github.com/segmentio/kafka-go"
 )
 
-func NewConsumer(ctx context.Context, wg *sync.WaitGroup, logger *slog.Logger, kafkaUrl string, consumerGroup string, topic string, listener func(delivery []byte) error) error {
+func NewConsumer(ctx context.Context, wg *sync.WaitGroup, logger *slog.Logger, kafkaUrl string, consumerGroup string, topic string, listener func(delivery []byte, t time.Time) error) error {
 	broker, err := GetBroker(kafkaUrl)
 	if err != nil {
 		logger.Error("unable to get broker list", "error", err)
@@ -42,6 +42,7 @@ func NewConsumer(ctx context.Context, wg *sync.WaitGroup, logger *slog.Logger, k
 		MaxWait:        1 * time.Second,
 		Logger:         log.New(io.Discard, "", 0),
 		ErrorLogger:    log.New(io.Discard, "", 0),
+		StartOffset:    kafka.LastOffset,
 	})
 	wg.Add(1)
 	go func() {
@@ -64,7 +65,7 @@ func NewConsumer(ctx context.Context, wg *sync.WaitGroup, logger *slog.Logger, k
 				}
 
 				err = retry(func() error {
-					return listener(m.Value)
+					return listener(m.Value, m.Time)
 				}, func(n int64) time.Duration {
 					return time.Duration(n) * time.Second
 				}, 10*time.Minute)

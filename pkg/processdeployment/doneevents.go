@@ -37,14 +37,14 @@ func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Conf
 				return err
 			}
 		}
-		return kafka.NewConsumer(ctx, wg, libConfig.GetLogger(), config.KafkaUrl, config.KafkaConsumerGroup, config.ProcessDeploymentDoneTopic, func(delivery []byte) error {
+		return kafka.NewConsumer(ctx, wg, libConfig.GetLogger(), config.KafkaUrl, config.KafkaConsumerGroup, config.ProcessDeploymentDoneTopic, func(delivery []byte, age time.Time) error {
 			msg := DoneNotification{}
 			err := json.Unmarshal(delivery, &msg)
 			if err != nil {
 				libConfig.GetLogger().Error("unable to interpret kafka msg", "error", err, "stack", string(debug.Stack()))
 				return nil //ignore message
 			}
-			libConfig.GetLogger().Debug("received done notification", "id", msg.Id, "source", msg.Handler, "command", msg.Command)
+			libConfig.GetLogger().Debug("received done notification", "id", msg.Id, "source", msg.Handler, "command", msg.Command, "age", time.Since(age).String())
 			if msg.Command == "PUT" {
 				eventId := deploymentIdToEventId(msg.Id)
 				err = camunda.SendEventTrigger(libConfig, eventId, nil)
