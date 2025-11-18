@@ -18,10 +18,10 @@ github.com/SENERGY-Platform/permissions-v2 v0.0.38 h1:zrzIzQ2TB4LENaVZFLK+dpO4KB
 github.com/SENERGY-Platform/permissions-v2 v0.0.38/go.mod h1:YtsSQK77GjQ6Df+HBA6e1/VB2OUihY1XcfQAhv/dRf0=
 github.com/SENERGY-Platform/process-deployment v0.0.20 h1:yBE8cBX/ZXmB5bZiEmlcaq54jrhsxwYIdQkyT0SV5HQ=
 github.com/SENERGY-Platform/process-deployment v0.0.20/go.mod h1:f+QupwHDJUCCSCGI0uhoppKmC8ehXAaBRGMDCyzApXY=
-github.com/SENERGY-Platform/service-commons v0.0.0-20250707072258-a5b49118c926 h1:afbD38cvjI7tbt19D/+eviN3GPuyMLRe+IHyVmE4p5U=
-github.com/SENERGY-Platform/service-commons v0.0.0-20250707072258-a5b49118c926/go.mod h1:1p2CQPNtler5leXqNgaOfr7DlgZUydrQlQYA97ycm4k=
-github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20250826124800-822d514cda3d h1:WkfwQsalbS1hdfesfgN3oixitXRe/4/LjjgovghxAAA=
-github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20250826124800-822d514cda3d/go.mod h1:+Xu5ZRRPf5GfVNrXuboZt0HsNrjeJuvayoX0HSCDfno=
+github.com/SENERGY-Platform/service-commons v0.0.0-20250903071414-1b34f1965afa h1:M2zfxq28OMVM8CbVNYYfpjiFant7GeucJ8Kdb1FE5Oo=
+github.com/SENERGY-Platform/service-commons v0.0.0-20250903071414-1b34f1965afa/go.mod h1:1p2CQPNtler5leXqNgaOfr7DlgZUydrQlQYA97ycm4k=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20251118075759-40c0749a7f92 h1:sZswmdm9TOTmXJm0LJz7UzpZVpzmY3Svr8AX/gNplmU=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20251118075759-40c0749a7f92/go.mod h1:+Xu5ZRRPf5GfVNrXuboZt0HsNrjeJuvayoX0HSCDfno=
 github.com/beevik/etree v1.4.0 h1:oz1UedHRepuY3p4N5OjE0nK1WLCqtzHf25bxplKOHLs=
 github.com/beevik/etree v1.4.0/go.mod h1:cyWiXwGoasx60gHvtnEh5x8+uIjUVnjWqBvEnhnqKDA=
 github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 h1:N7oVaKyGp8bttX0bfZGmcGkjz7DLQXhAn3DNd3T0ous=
