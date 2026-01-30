@@ -17,61 +17,23 @@
 package processdeployment
 
 import (
-	"context"
-	"encoding/json"
-	"runtime/debug"
-	"sync"
 	"time"
 
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/camunda"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
-	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/kafka"
 )
 
-func StartDoneEventHandling(ctx context.Context, wg *sync.WaitGroup, config Config, libConfig configuration.Config) error {
-	if config.KafkaUrl != "" && config.KafkaUrl != "-" {
-		if config.InitTopics {
-			err := kafka.InitTopic(config.KafkaUrl, config.ProcessDeploymentDoneTopic)
-			if err != nil {
-				libConfig.GetLogger().Error("unable to create topic", "error", err)
-				return err
-			}
+func triggerDoneEvent(libConfig configuration.Config, resourceId string) {
+	go func() {
+		time.Sleep(5 * time.Second)
+		eventId := deploymentIdToEventId(resourceId)
+		err := camunda.SendEventTrigger(libConfig, eventId, nil)
+		if err != nil {
+			libConfig.GetLogger().Error("unable to send event trigger", "error", err)
 		}
-		return kafka.NewConsumer(ctx, wg, libConfig.GetLogger(), config.KafkaUrl, config.KafkaConsumerGroup, config.ProcessDeploymentDoneTopic, func(delivery []byte, age time.Time) error {
-			msg := DoneNotification{}
-			err := json.Unmarshal(delivery, &msg)
-			if err != nil {
-				libConfig.GetLogger().Error("unable to interpret kafka msg", "error", err, "stack", string(debug.Stack()))
-				return nil //ignore message
-			}
-			libConfig.GetLogger().Debug("received done notification", "id", msg.Id, "source", msg.Handler, "command", msg.Command, "age", time.Since(age).String())
-			if msg.Command == "PUT" {
-				eventId := deploymentIdToEventId(msg.Id)
-				err = camunda.SendEventTrigger(libConfig, eventId, nil)
-				if err != nil {
-					libConfig.GetLogger().Error("unable to send event trigger", "error", err, "stack", string(debug.Stack()))
-					return err
-				}
-				go func() {
-					time.Sleep(5 * time.Second)
-					err = camunda.SendEventTrigger(libConfig, eventId, nil)
-					if err != nil {
-						libConfig.GetLogger().Error("unable to send event trigger", "error", err, "stack", string(debug.Stack()))
-					}
-				}()
-			}
-			return nil
-		})
-	}
-	return nil
+	}()
 }
 
 func deploymentIdToEventId(id string) string {
 	return "deployment_done_" + id
-}
-
-type DoneNotification struct {
-	Command string `json:"command"`
-	Id      string `json:"id"`
-	Handler string `json:"handler"`
 }

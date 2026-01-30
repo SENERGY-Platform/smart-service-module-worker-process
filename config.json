@@ -22,10 +22,5 @@
     "token_cache_default_expiration_in_seconds": 60,
     "token_cache_size_in_mb": 20,
 
-    "kafka_url": "",
-    "kafka_consumer_group": "smart-service-module-worker-process-1",
-    "process_deployment_done_topic": "process-deployment-done",
-    "init_topics": false,
-
     "log_level": "info"
 }

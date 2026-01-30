@@ -36,10 +36,6 @@ import (
 )
 
 func New(ctx context.Context, wg *sync.WaitGroup, config Config, libConfig configuration.Config, auth *auth.Auth, smartServiceRepo SmartServiceRepo) (*ProcessDeployment, error) {
-	err := StartDoneEventHandling(ctx, wg, config, libConfig)
-	if err != nil {
-		return nil, err
-	}
 	return &ProcessDeployment{config: config, libConfig: libConfig, auth: auth, smartServiceRepo: smartServiceRepo}, nil
 }
 
@@ -109,7 +105,6 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 
 	outputs = map[string]interface{}{
 		"process_deployment_id": resultDeployment.Id,
-		"done_event":            deploymentIdToEventId(resultDeployment.Id),
 	}
 	if isFogDeployment {
 		outputs["is_fog_deployment"] = true
@@ -118,6 +113,8 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 		outputs["is_fog_deployment"] = false
 		outputs["fog_hub"] = ""
 	}
+
+	triggerDoneEvent(this.libConfig, resultDeployment.Id)
 
 	return []model.Module{{
 			Id:               this.getModuleId(task),
