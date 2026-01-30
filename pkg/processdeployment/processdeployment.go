@@ -105,6 +105,7 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 
 	outputs = map[string]interface{}{
 		"process_deployment_id": resultDeployment.Id,
+		"done_event":            deploymentIdToEventId(resultDeployment.Id),
 	}
 	if isFogDeployment {
 		outputs["is_fog_deployment"] = true
