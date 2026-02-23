@@ -20,10 +20,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"runtime/debug"
+	"time"
 
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
@@ -103,4 +105,95 @@ func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmod
 	}
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	return result, err
+}
+
+var DefaultTimeout = 30 * time.Second
+
+func (this *ProcessDeployment) CheckDeployment(token auth.Token, deploymentId string) (int, error) {
+	client := http.Client{
+		Timeout: DefaultTimeout,
+	}
+	req, err := http.NewRequest(
+		"GET",
+		this.config.ProcessDeploymentUrl+"/v3/deployments/"+url.PathEscape(deploymentId),
+		nil,
+	)
+	if err != nil {
+		this.libConfig.GetLogger().Error("error in CheckDeployment", "error", err, "stack", string(debug.Stack()))
+		return 0, err
+	}
+	req.Header.Set("Authorization", token.Jwt())
+	req.Header.Set("X-UserId", token.GetUserId())
+
+	this.libConfig.GetLogger().Debug("check deployment request", "url", req.URL.String(), "method", req.Method, "token", req.Header.Get("Authorization"), "xuser", req.Header.Get("X-UserId"))
+
+	resp, err := client.Do(req)
+	if err != nil {
+		this.libConfig.GetLogger().Error("error in CheckDeployment", "error", err, "stack", string(debug.Stack()))
+		return 0, err
+	}
+	resp.Body.Close()
+	return resp.StatusCode, nil
+}
+
+func (this *ProcessDeployment) CheckFogDeployment(token auth.Token, hubId string, deploymentId string) (error, error) {
+	metadata, err, _ := this.GetFogSyncMetadata(token, hubId, deploymentId)
+	if err != nil {
+		return nil, err
+	}
+	if len(metadata) == 0 {
+		return fmt.Errorf("no matching fog process deployment found"), nil
+	}
+	if metadata[0].MarkedForDelete {
+		return fmt.Errorf("fog deployment is marked for deletion"), nil
+	}
+	if metadata[0].IsPlaceholder {
+		return fmt.Errorf("fog deployment is marked as placeholder"), nil
+	}
+	return nil, nil
+}
+
+func (this *ProcessDeployment) GetFogSyncMetadata(token auth.Token, hubId string, deploymentId string) (result []DeploymentMetadata, err error, code int) {
+	req, err := http.NewRequest("GET", this.config.FogProcessSyncUrl+"/metadata/"+url.PathEscape(hubId)+"?deployment_id="+url.QueryEscape(deploymentId), nil)
+	if err != nil {
+		return result, err, http.StatusInternalServerError
+	}
+
+	req.Header.Set("Authorization", token.Jwt())
+	client := &http.Client{
+		Timeout: DefaultTimeout,
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return result, err, http.StatusInternalServerError
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode >= 300 {
+		buf := new(bytes.Buffer)
+		buf.ReadFrom(resp.Body)
+		err = errors.New(buf.String())
+		return result, err, resp.StatusCode
+	}
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		_, _ = io.ReadAll(resp.Body) //ensure empty body to enable connection reuse and prevent memory leaks
+		return result, err, http.StatusInternalServerError
+	}
+	return result, err, http.StatusOK
+}
+
+type DeploymentMetadata struct {
+	Metadata
+	SyncInfo
+}
+
+type Metadata struct {
+	CamundaDeploymentId string `json:"camunda_deployment_id"`
+}
+
+type SyncInfo struct {
+	NetworkId       string    `json:"network_id"`
+	IsPlaceholder   bool      `json:"is_placeholder"`
+	MarkedForDelete bool      `json:"marked_for_delete"`
+	SyncDate        time.Time `json:"sync_date"`
 }

@@ -26,4 +26,6 @@ type Config struct {
 	ProcessDeploymentSource      string `json:"process_deployment_source"`
 	WorkerParamPrefix            string `json:"worker_param_prefix"`
 	InitTopics                   bool   `json:"init_topics"`
+
+	HealthCheckInterval string `json:"health_check_interval"`
 }
