@@ -8,8 +8,8 @@ github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERo
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
 github.com/SENERGY-Platform/developer-notifications v0.0.4 h1:SmblhfWavNhE1mDxzrkhmWl2AoPPqKD+7YcZCQ7a5Tg=
 github.com/SENERGY-Platform/developer-notifications v0.0.4/go.mod h1:8yJrYnAYMtPEPy89ULw8ivgG8orVhSnaLgyfDt0bdgg=
-github.com/SENERGY-Platform/device-repository v0.2.39 h1:ohR2JWGdG8TwCID0O+ZYPBsXn3q4EB4t9SVeAE00Fqs=
-github.com/SENERGY-Platform/device-repository v0.2.39/go.mod h1:iWXh+P6CRogyx/DShjxIalXojxasbUUmk1RFDsAtE8Y=
+github.com/SENERGY-Platform/device-repository v0.2.40 h1:ZeiIhB1aUBloWtZ+byq2Of5ylnqkMuPlag1bAt//TmY=
+github.com/SENERGY-Platform/device-repository v0.2.40/go.mod h1:iWXh+P6CRogyx/DShjxIalXojxasbUUmk1RFDsAtE8Y=
 github.com/SENERGY-Platform/go-service-base/struct-logger v0.6.0 h1:DQNAPU1DI3XNyLaIGnHN9O0gZ7Q+tyOq/ZmAvbL/5gg=
 github.com/SENERGY-Platform/go-service-base/struct-logger v0.6.0/go.mod h1:z9cf8WOUMLoifRj5Tqts1MNe6QoPFq5Msxj899ZC11g=
 github.com/SENERGY-Platform/models/go v0.0.0-20251202070403-e7e5579f7111 h1:FuKWD5CANJ9q9cBVUrOag0FY0WFDB+qPtwXHn2fxO50=
@@ -20,8 +20,8 @@ github.com/SENERGY-Platform/process-deployment v0.0.22 h1:FEin/++V5RiGz8iQHW3q8+
 github.com/SENERGY-Platform/process-deployment v0.0.22/go.mod h1:jYk8/QFADu8yQKOlosz79ucQhZcEK07blB2HeQMd+d4=
 github.com/SENERGY-Platform/service-commons v0.0.0-20260106114257-16bca4ba28e7 h1:FwDYhfQf/ftlVhbuh9bTM40MVhC8Y5KY8G6umlsOlyc=
 github.com/SENERGY-Platform/service-commons v0.0.0-20260106114257-16bca4ba28e7/go.mod h1:zPl5mBq6dpXOpgEu+CZbF3sL/9VCDjdzSC1+1ox0kLM=
-github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260220084951-145508c11b87 h1:H9aIQ0KzuuDQ1uQ+7vbFYBknR2b5SugwnPuQmVKD8/E=
-github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260220084951-145508c11b87/go.mod h1:CzfLpw5iTpgwV+fsxB0eN2QuD90/kNqq/vO5RBA3zUo=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260302073741-e7f1bb7c9def h1:DokWF58ocdgTX3CtDXOo4P0u0tGWQi+BkXcPjGLXHuk=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260302073741-e7f1bb7c9def/go.mod h1:CzfLpw5iTpgwV+fsxB0eN2QuD90/kNqq/vO5RBA3zUo=
 github.com/beevik/etree v1.4.0 h1:oz1UedHRepuY3p4N5OjE0nK1WLCqtzHf25bxplKOHLs=
 github.com/beevik/etree v1.4.0/go.mod h1:cyWiXwGoasx60gHvtnEh5x8+uIjUVnjWqBvEnhnqKDA=
 github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 h1:N7oVaKyGp8bttX0bfZGmcGkjz7DLQXhAn3DNd3T0ous=

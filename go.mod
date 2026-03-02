@@ -5,14 +5,14 @@ go 1.25.0
 require (
 	github.com/SENERGY-Platform/process-deployment v0.0.22
 	github.com/SENERGY-Platform/service-commons v0.0.0-20260106114257-16bca4ba28e7
-	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260220084951-145508c11b87
+	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260302073741-e7f1bb7c9def
 	github.com/julienschmidt/httprouter v1.3.0
 )
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/SENERGY-Platform/developer-notifications v0.0.4 // indirect
-	github.com/SENERGY-Platform/device-repository v0.2.39 // indirect
+	github.com/SENERGY-Platform/device-repository v0.2.40 // indirect
 	github.com/SENERGY-Platform/go-service-base/struct-logger v0.6.0 // indirect
 	github.com/SENERGY-Platform/models/go v0.0.0-20251202070403-e7e5579f7111 // indirect
 	github.com/SENERGY-Platform/permissions-v2 v0.0.41 // indirect

@@ -24,5 +24,6 @@
 
     "log_level": "info",
 
-    "health_check_interval": "1h"
+    "health_check_interval": "1h",
+    "fetch_retries": 5
 }
