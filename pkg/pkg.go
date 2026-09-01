@@ -44,7 +44,7 @@ func Start(ctx context.Context, wg *sync.WaitGroup, config processdeployment.Con
 			return nil, err
 		}
 
-		healthCheck := func(module model.SmartServiceModule) (health error, err error) {
+		healthCheck := func(ctx context.Context, module model.SmartServiceModule) (health error, err error) {
 			token, err := auth.ExchangeUserToken(module.UserId)
 			if err != nil {
 				return nil, err
@@ -54,9 +54,9 @@ func Start(ctx context.Context, wg *sync.WaitGroup, config processdeployment.Con
 				return nil, err
 			}
 			if isFogDeployment {
-				return handler.CheckFogDeployment(token, fogHubId, deploymentId)
+				return handler.CheckFogDeployment(ctx, token, fogHubId, deploymentId)
 			}
-			code, err := handler.CheckDeployment(token, deploymentId)
+			code, err := handler.CheckDeployment(ctx, token, deploymentId)
 			if err != nil {
 				return nil, err
 			}
@@ -67,7 +67,7 @@ func Start(ctx context.Context, wg *sync.WaitGroup, config processdeployment.Con
 		}
 		moduleQuery := model.ModulQuery{TypeFilter: &libConfig.CamundaWorkerTopic}
 		smartServiceRepo.StartHealthCheck(ctx, interval, moduleQuery, healthCheck) //timer loop
-		smartServiceRepo.RunHealthCheck(moduleQuery, healthCheck)                  //initial check
+		smartServiceRepo.RunHealthCheck(ctx, moduleQuery, healthCheck)             //initial check
 		return handler, nil
 	}
 	return lib.Start(ctx, wg, libConfig, handlerFactory)

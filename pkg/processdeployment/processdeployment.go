@@ -28,6 +28,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/SENERGY-Platform/gin-middleware/otelx"
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
@@ -47,46 +48,46 @@ type ProcessDeployment struct {
 }
 
 type SmartServiceRepo interface {
-	GetInstanceUser(instanceId string) (userId string, err error)
-	UseModuleDeleteInfo(info model.ModuleDeleteInfo) error
+	GetInstanceUser(ctx context.Context, instanceId string) (userId string, err error)
+	UseModuleDeleteInfo(ctx context.Context, info model.ModuleDeleteInfo) error
 }
 
-func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []model.Module, outputs map[string]interface{}, err error) {
+func (this *ProcessDeployment) Do(ctx context.Context, task model.CamundaExternalTask) (modules []model.Module, outputs map[string]interface{}, err error) {
 	modelId := this.getProcessModelId(task)
 	if modelId == "" {
 		return modules, outputs, errors.New("missing process model id")
 	}
-	userId, err := this.smartServiceRepo.GetInstanceUser(task.ProcessInstanceId)
+	userId, err := this.smartServiceRepo.GetInstanceUser(ctx, task.ProcessInstanceId)
 	if err != nil {
-		this.libConfig.GetLogger().Error("unable to get instance user", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "unable to get instance user", "error", err)
 		return modules, outputs, err
 	}
 	token, err := this.auth.ExchangeUserToken(userId)
 	if err != nil {
-		this.libConfig.GetLogger().Error("unable to exchange user token", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "unable to exchange user token", "error", err)
 		return modules, outputs, err
 	}
-	deployment, err := this.PrepareRequest(token, modelId)
+	deployment, err := this.PrepareRequest(ctx, token, modelId)
 	if err != nil {
-		this.libConfig.GetLogger().Error("unable to prepare process deployment", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "unable to prepare process deployment", "error", err)
 		return modules, outputs, err
 	}
 
 	err = this.UseVariables(task, &deployment)
 	if err != nil {
-		this.libConfig.GetLogger().Error("unable to use variables", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "unable to use variables", "error", err)
 		return modules, outputs, err
 	}
 
-	isFogDeployment, hubId, err := this.IsFogDeployment(token, task, deployment)
+	isFogDeployment, hubId, err := this.IsFogDeployment(ctx, token, task, deployment)
 	if err != nil {
-		this.libConfig.GetLogger().Error("unable to use variables", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "unable to use variables", "error", err)
 		return modules, outputs, err
 	}
 
-	resultDeployment, err := this.Deploy(token, deployment, true, hubId)
+	resultDeployment, err := this.Deploy(ctx, token, deployment, true, hubId)
 	if err != nil {
-		this.libConfig.GetLogger().Error("unable to deploy process", "error", err)
+		this.libConfig.GetLogger().ErrorContext(ctx, "unable to deploy process", "error", err)
 		return modules, outputs, err
 	}
 
@@ -133,13 +134,13 @@ func (this *ProcessDeployment) Do(task model.CamundaExternalTask) (modules []mod
 		err
 }
 
-func (this *ProcessDeployment) Undo(modules []model.Module, reason error) {
-	this.libConfig.GetLogger().Debug("undo", "reason", reason)
+func (this *ProcessDeployment) Undo(ctx context.Context, modules []model.Module, reason error) {
+	this.libConfig.GetLogger().DebugContext(ctx, "undo", "reason", reason)
 	for _, module := range modules {
 		if module.DeleteInfo != nil {
-			err := this.smartServiceRepo.UseModuleDeleteInfo(*module.DeleteInfo)
+			err := this.smartServiceRepo.UseModuleDeleteInfo(ctx, *module.DeleteInfo)
 			if err != nil {
-				this.libConfig.GetLogger().Error("error in ProcessDeployment.Undo", "error", err, "stack", string(debug.Stack()))
+				this.libConfig.GetLogger().ErrorContext(ctx, "error in ProcessDeployment.Undo", "error", err, "stack", string(debug.Stack()))
 			}
 		}
 	}
@@ -181,13 +182,13 @@ func (this *ProcessDeployment) getModuleId(task model.CamundaExternalTask) strin
 	return task.ProcessInstanceId + "." + task.Id
 }
 
-func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.CamundaExternalTask, deployment deploymentmodel.Deployment) (isFogDeployment bool, hubId string, err error) {
+func (this *ProcessDeployment) IsFogDeployment(ctx context.Context, token auth.Token, task model.CamundaExternalTask, deployment deploymentmodel.Deployment) (isFogDeployment bool, hubId string, err error) {
 	preferFogDeployment, err := this.getPreferFogDeployment(task)
 	if err != nil {
 		return false, "", err
 	}
 	if !preferFogDeployment {
-		this.libConfig.GetLogger().Debug("IsFogDeployment: preferFogDeployment == false")
+		this.libConfig.GetLogger().DebugContext(ctx, "IsFogDeployment: preferFogDeployment == false")
 		return false, "", nil
 	}
 
@@ -232,27 +233,27 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 		}
 	}
 	if !this.config.AllowMsgEventsInFogProcesses && usesEvents {
-		this.libConfig.GetLogger().Debug("IsFogDeployment: usesEvents == true && AllowMsgEventsInFogProcesses == false")
+		this.libConfig.GetLogger().DebugContext(ctx, "IsFogDeployment: usesEvents == true && AllowMsgEventsInFogProcesses == false")
 		return false, "", nil
 	}
 	if !this.config.AllowImportsInFogProcesses && len(imports) > 0 {
-		this.libConfig.GetLogger().Debug("IsFogDeployment: len(imports) > 0 && AllowImportsInFogProcesses == false")
+		this.libConfig.GetLogger().DebugContext(ctx, "IsFogDeployment: len(imports) > 0 && AllowImportsInFogProcesses == false")
 		return false, "", nil
 	}
 	for _, groupId := range groups {
-		group, err := this.GetGroup(token, groupId)
+		group, err := this.GetGroup(ctx, token, groupId)
 		if err != nil {
 			return false, "", err
 		}
 		devices = append(devices, group.DeviceIds...)
 	}
 
-	networks, err := this.GetFogNetworks(token)
+	networks, err := this.GetFogNetworks(ctx, token)
 	if err != nil {
 		return false, "", err
 	}
 	if len(devices) == 0 {
-		this.libConfig.GetLogger().Warn("process deployments without devices wont be run in fog")
+		this.libConfig.GetLogger().WarnContext(ctx, "process deployments without devices wont be run in fog")
 		return false, "", nil
 	}
 	missingDevices := map[string]string{}
@@ -274,7 +275,7 @@ func (this *ProcessDeployment) IsFogDeployment(token auth.Token, task model.Camu
 			return true, network.Id, nil
 		}
 	}
-	this.libConfig.GetLogger().Debug("IsFogDeployment: missingDeviceInNetwork", "missingDevices", fmt.Sprintf("%#v", missingDevices))
+	this.libConfig.GetLogger().DebugContext(ctx, "IsFogDeployment: missingDeviceInNetwork", "missingDevices", fmt.Sprintf("%#v", missingDevices))
 	return false, "", nil
 }
 
@@ -285,7 +286,7 @@ type Hub struct {
 	DeviceIds      []string `json:"device_ids"`
 }
 
-func (this *ProcessDeployment) GetFogNetworks(token auth.Token) (result []Hub, err error) {
+func (this *ProcessDeployment) GetFogNetworks(ctx context.Context, token auth.Token) (result []Hub, err error) {
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
@@ -294,6 +295,11 @@ func (this *ProcessDeployment) GetFogNetworks(token auth.Token) (result []Hub, e
 		this.config.FogProcessSyncUrl+"/networks",
 		nil,
 	)
+	if err != nil {
+		debug.PrintStack()
+		return result, err
+	}
+	err = otelx.InjectContextToRequest(ctx, req)
 	if err != nil {
 		debug.PrintStack()
 		return result, err
@@ -323,7 +329,7 @@ type DeviceGroup struct {
 	DeviceIds []string `json:"device_ids"`
 }
 
-func (this *ProcessDeployment) GetGroup(token auth.Token, id string) (result DeviceGroup, err error) {
+func (this *ProcessDeployment) GetGroup(ctx context.Context, token auth.Token, id string) (result DeviceGroup, err error) {
 	client := http.Client{
 		Timeout: 5 * time.Second,
 	}
@@ -332,6 +338,11 @@ func (this *ProcessDeployment) GetGroup(token auth.Token, id string) (result Dev
 		this.config.DeviceRepositoryUrl+"/device-groups/"+url.PathEscape(id),
 		nil,
 	)
+	if err != nil {
+		debug.PrintStack()
+		return result, err
+	}
+	err = otelx.InjectContextToRequest(ctx, req)
 	if err != nil {
 		debug.PrintStack()
 		return result, err

@@ -18,6 +18,7 @@ package processdeployment
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -27,12 +28,17 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/SENERGY-Platform/gin-middleware/otelx"
 	"github.com/SENERGY-Platform/process-deployment/lib/model/deploymentmodel"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/auth"
 )
 
-func (this *ProcessDeployment) PrepareRequest(token auth.Token, processId string) (deployment deploymentmodel.Deployment, err error) {
+func (this *ProcessDeployment) PrepareRequest(ctx context.Context, token auth.Token, processId string) (deployment deploymentmodel.Deployment, err error) {
 	req, err := http.NewRequest("GET", this.config.ProcessDeploymentUrl+"/v3/prepared-deployments/"+url.PathEscape(processId)+"?with_options=false", nil)
+	if err != nil {
+		return deployment, err
+	}
+	err = otelx.InjectContextToRequest(ctx, req)
 	if err != nil {
 		return deployment, err
 	}
@@ -52,7 +58,7 @@ func (this *ProcessDeployment) PrepareRequest(token auth.Token, processId string
 	return deployment, err
 }
 
-func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmodel.Deployment, allowMissingServiceSelection bool, hubId string) (result deploymentmodel.Deployment, err error) {
+func (this *ProcessDeployment) Deploy(ctx context.Context, token auth.Token, deployment deploymentmodel.Deployment, allowMissingServiceSelection bool, hubId string) (result deploymentmodel.Deployment, err error) {
 	queryStr := ""
 	query := url.Values{}
 	source := this.config.ProcessDeploymentSource
@@ -80,7 +86,7 @@ func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmod
 	body := new(bytes.Buffer)
 	err = json.NewEncoder(body).Encode(deployment)
 	if err != nil {
-		this.libConfig.GetLogger().Error("error in ProcessDeployment.Deploy", "error", err, "stack", string(debug.Stack()))
+		this.libConfig.GetLogger().ErrorContext(ctx, "error in ProcessDeployment.Deploy", "error", err, "stack", string(debug.Stack()))
 		return result, err
 	}
 	endpoint := this.config.ProcessDeploymentUrl + "/v3/deployments" + queryStr
@@ -88,6 +94,10 @@ func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmod
 		endpoint = this.config.FogProcessDeploymentUrl + "/deployments/" + url.PathEscape(hubId) + queryStr
 	}
 	req, err := http.NewRequest("POST", endpoint, body)
+	if err != nil {
+		return result, err
+	}
+	err = otelx.InjectContextToRequest(ctx, req)
 	if err != nil {
 		return result, err
 	}
@@ -109,7 +119,7 @@ func (this *ProcessDeployment) Deploy(token auth.Token, deployment deploymentmod
 
 var DefaultTimeout = 30 * time.Second
 
-func (this *ProcessDeployment) CheckDeployment(token auth.Token, deploymentId string) (int, error) {
+func (this *ProcessDeployment) CheckDeployment(ctx context.Context, token auth.Token, deploymentId string) (int, error) {
 	client := http.Client{
 		Timeout: DefaultTimeout,
 	}
@@ -119,25 +129,30 @@ func (this *ProcessDeployment) CheckDeployment(token auth.Token, deploymentId st
 		nil,
 	)
 	if err != nil {
-		this.libConfig.GetLogger().Error("error in CheckDeployment", "error", err, "stack", string(debug.Stack()))
+		this.libConfig.GetLogger().ErrorContext(ctx, "error in CheckDeployment", "error", err, "stack", string(debug.Stack()))
+		return 0, err
+	}
+	err = otelx.InjectContextToRequest(ctx, req)
+	if err != nil {
+		this.libConfig.GetLogger().ErrorContext(ctx, "error in CheckDeployment", "error", err, "stack", string(debug.Stack()))
 		return 0, err
 	}
 	req.Header.Set("Authorization", token.Jwt())
 	req.Header.Set("X-UserId", token.GetUserId())
 
-	this.libConfig.GetLogger().Debug("check deployment request", "url", req.URL.String(), "method", req.Method, "token", req.Header.Get("Authorization"), "xuser", req.Header.Get("X-UserId"))
+	this.libConfig.GetLogger().DebugContext(ctx, "check deployment request", "url", req.URL.String(), "method", req.Method, "xuser", req.Header.Get("X-UserId"))
 
 	resp, err := client.Do(req)
 	if err != nil {
-		this.libConfig.GetLogger().Error("error in CheckDeployment", "error", err, "stack", string(debug.Stack()))
+		this.libConfig.GetLogger().ErrorContext(ctx, "error in CheckDeployment", "error", err, "stack", string(debug.Stack()))
 		return 0, err
 	}
 	resp.Body.Close()
 	return resp.StatusCode, nil
 }
 
-func (this *ProcessDeployment) CheckFogDeployment(token auth.Token, hubId string, deploymentId string) (error, error) {
-	metadata, err, _ := this.GetFogSyncMetadata(token, hubId, deploymentId)
+func (this *ProcessDeployment) CheckFogDeployment(ctx context.Context, token auth.Token, hubId string, deploymentId string) (error, error) {
+	metadata, err, _ := this.GetFogSyncMetadata(ctx, token, hubId, deploymentId)
 	if err != nil {
 		return nil, err
 	}
@@ -153,12 +168,16 @@ func (this *ProcessDeployment) CheckFogDeployment(token auth.Token, hubId string
 	return nil, nil
 }
 
-func (this *ProcessDeployment) GetFogSyncMetadata(token auth.Token, hubId string, deploymentId string) (result []DeploymentMetadata, err error, code int) {
+func (this *ProcessDeployment) GetFogSyncMetadata(ctx context.Context, token auth.Token, hubId string, deploymentId string) (result []DeploymentMetadata, err error, code int) {
 	req, err := http.NewRequest("GET", this.config.FogProcessSyncUrl+"/metadata/"+url.PathEscape(hubId)+"?deployment_id="+url.QueryEscape(deploymentId), nil)
 	if err != nil {
 		return result, err, http.StatusInternalServerError
 	}
 
+	err = otelx.InjectContextToRequest(ctx, req)
+	if err != nil {
+		return result, err, http.StatusInternalServerError
+	}
 	req.Header.Set("Authorization", token.Jwt())
 	client := &http.Client{
 		Timeout: DefaultTimeout,

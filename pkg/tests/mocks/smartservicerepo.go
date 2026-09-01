@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"github.com/SENERGY-Platform/service-commons/pkg/accesslog"
 	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/configuration"
+	"github.com/SENERGY-Platform/smart-service-module-worker-lib/pkg/model"
 	"github.com/SENERGY-Platform/smart-service-module-worker-process/pkg/processdeployment"
 	"github.com/julienschmidt/httprouter"
 	"io"
@@ -89,6 +90,21 @@ func (this *SmartServiceRepoMock) getRouter() http.Handler {
 			Message:  msg,
 		})
 		writer.Write(temp)
+	})
+
+	//GetCachedSmartServiceInstance/GetSmartServiceInstance: the lib fetches the whole instance for every
+	//task, not only its user-id, to also carry the smart-service-instance-id used for the otel baggage.
+	router.GET("/instances-by-process-id/:id", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {
+		temp, _ := io.ReadAll(request.Body)
+		this.logRequest(Request{
+			Method:   request.Method,
+			Endpoint: request.URL.Path,
+			Message:  string(temp),
+		})
+		json.NewEncoder(writer).Encode(model.SmartServiceInstance{
+			Id:     params.ByName("id"),
+			UserId: userId,
+		})
 	})
 
 	router.GET("/instances-by-process-id/:id/user-id", func(writer http.ResponseWriter, request *http.Request, params httprouter.Params) {

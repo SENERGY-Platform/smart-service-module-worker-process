@@ -24,8 +24,8 @@ github.com/SENERGY-Platform/process-deployment v0.0.23 h1:srwYXauOoF5iqkTqqJAtEU
 github.com/SENERGY-Platform/process-deployment v0.0.23/go.mod h1:kHWQNF4u9KSbsZbXzpzmMErfN4e+zS8WeLeSVY3CBVs=
 github.com/SENERGY-Platform/service-commons v0.0.0-20260821114734-3e4578ac2358 h1:RGgwqd2PKoBCbW2aBdl43OO5O7JNC2LKE452Ihi4TdM=
 github.com/SENERGY-Platform/service-commons v0.0.0-20260821114734-3e4578ac2358/go.mod h1:k1Jia3JItpaM26/SY1ZGyoGhBE8EA5zQrkwSaiFZKGQ=
-github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260827065540-cdfae7f76927 h1:yFYYJdMfVVtTZqxJdJKxfvqg7cT0yZ84SPgNllmqZIY=
-github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260827065540-cdfae7f76927/go.mod h1:1ZRwD2rUFGv/6rboNnXykKf3JZUwc88b9FibtPcGS9A=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260901044136-21c33469053e h1:7zrC7DhBUrGVyAJgIRek1NA2boAcTEpWC6ahjYyYdxc=
+github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260901044136-21c33469053e/go.mod h1:u7TXw0cWBZA8fhoCllwEOhfTLOuCN4OeHhw9KPLN7Ps=
 github.com/beevik/etree v1.4.0 h1:oz1UedHRepuY3p4N5OjE0nK1WLCqtzHf25bxplKOHLs=
 github.com/beevik/etree v1.4.0/go.mod h1:cyWiXwGoasx60gHvtnEh5x8+uIjUVnjWqBvEnhnqKDA=
 github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 h1:N7oVaKyGp8bttX0bfZGmcGkjz7DLQXhAn3DNd3T0ous=
