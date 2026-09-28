@@ -41,6 +41,7 @@
 - Variable-Name-Example: `process_deployment.Task_1uopw0b.selection`
 - Value: json.Marshal(model.IotOption{})
 - Value-Example: `{"device_selection":{"device_id":"device_7","service_id":"s12","path":"root.value_s12.v2"}}`
+- Filter-Criteria: the `filter_criteria` of an element are taken from the prepared deployment and passed on unchanged. `aspect_ids` names the aspects of a criteria as a list; `aspect_id` is deprecated and an alias for an `aspect_ids` list with one element. The worker folds neither spelling into the other, the alias is resolved where the criteria are evaluated.
 
 ### Task-Parameter
 
