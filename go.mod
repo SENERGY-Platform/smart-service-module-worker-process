@@ -6,7 +6,7 @@ require (
 	github.com/SENERGY-Platform/gin-middleware v0.14.1
 	github.com/SENERGY-Platform/process-deployment v0.1.0
 	github.com/SENERGY-Platform/service-commons v0.0.0-20260915085610-4949c31a01ef
-	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20260928072743-d2c820b76945
+	github.com/SENERGY-Platform/smart-service-module-worker-lib v0.0.0-20261006080333-b6af9a5986cb
 	github.com/julienschmidt/httprouter v1.3.0
 )
 
